@@ -14,11 +14,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const [directionsRenderer, setDirectionsRenderer] = React.useState(null);
   const [internalMap, setInternalMap] = React.useState(null);
 
-  React.useEffect(() => {
-    if (window.google && window.google.maps) {
-      setDirectionsRenderer(new window.google.maps.DirectionsRenderer({ preserveViewport: true }));
-    }
-  }, []);
+
 
   React.useEffect(() => {
     if (directionsRenderer && internalMap) {
@@ -79,9 +75,10 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         }}
         onChildClick={(child) => setChildClicked(child)}
         yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={({ map }) => {
+        onGoogleApiLoaded={({ map, maps }) => {
           setMap(map);
           setInternalMap(map);
+          setDirectionsRenderer(new maps.DirectionsRenderer({ preserveViewport: true }));
         }}
       >
         {places.length > 0 && places.map((place, i) => (
