@@ -8,7 +8,7 @@ const getGroundedModel = () => {
   if (!genAI) throw new Error('Missing Gemini API Key in .env file.');
 
   return genAI.getGenerativeModel({
-    model: 'gemini-1.5-flash',
+    model: 'gemini-2.5-flash',
     tools: [
       {
         googleSearchRetrieval: {
