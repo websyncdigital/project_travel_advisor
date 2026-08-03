@@ -14,8 +14,6 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const [directionsRenderer, setDirectionsRenderer] = React.useState(null);
   const [internalMap, setInternalMap] = React.useState(null);
 
-
-
   React.useEffect(() => {
     if (directionsRenderer && internalMap) {
       directionsRenderer.setMap(internalMap);
