@@ -16,6 +16,33 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const [routeError, setRouteError] = React.useState('');
   const [routeInfo, setRouteInfo] = React.useState(null);
 
+  const errorBannerStyle = {
+    position: 'absolute',
+    top: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 10,
+    backgroundColor: 'red',
+    color: 'white',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
+  };
+
+  const infoBannerStyle = {
+    position: 'absolute',
+    top: 10,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 10,
+    backgroundColor: '#2196F3',
+    color: 'white',
+    padding: '10px 20px',
+    borderRadius: '5px',
+    fontWeight: 'bold',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+  };
+
   React.useEffect(() => {
     if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
       const directionsService = new window.google.maps.DirectionsService();
@@ -81,12 +108,12 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   return (
     <div className={classes.mapContainer} style={{ position: 'relative' }}>
       {routeError && (
-        <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10, backgroundColor: 'red', color: 'white', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold' }}>
+        <div style={errorBannerStyle}>
           Route Error: {routeError} - Please check if Directions API is enabled in Google Cloud Console!
         </div>
       )}
       {routeInfo && (
-        <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10, backgroundColor: '#2196F3', color: 'white', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+        <div style={infoBannerStyle}>
           Route Distance: {routeInfo}
         </div>
       )}
