@@ -88,7 +88,7 @@ const App = () => {
   }, [rating, places]);
 
   useEffect(() => {
-    if (bounds && map) {
+    if (bounds && map && !selectedDestination) {
       setIsLoading(true);
 
       const service = new window.google.maps.places.PlacesService(map);

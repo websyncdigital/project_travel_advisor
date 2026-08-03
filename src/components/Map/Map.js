@@ -17,16 +17,24 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   React.useEffect(() => {
     if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
       if (!directionsRendererRef.current) {
-        directionsRendererRef.current = new window.google.maps.DirectionsRenderer({ preserveViewport: true });
+        directionsRendererRef.current = new window.google.maps.DirectionsRenderer();
         directionsRendererRef.current.setMap(internalMap);
       }
 
       const directionsService = new window.google.maps.DirectionsService();
 
       const origin = { lat: coords.lat, lng: coords.lng };
+      const destinationLat = typeof selectedDestination.geometry?.location?.lat === 'function'
+        ? selectedDestination.geometry.location.lat()
+        : (selectedDestination.geometry?.location?.lat || selectedDestination.latitude);
+
+      const destinationLng = typeof selectedDestination.geometry?.location?.lng === 'function'
+        ? selectedDestination.geometry.location.lng()
+        : (selectedDestination.geometry?.location?.lng || selectedDestination.longitude);
+
       const destination = {
-        lat: Number(selectedDestination.geometry?.location?.lat() || selectedDestination.latitude),
-        lng: Number(selectedDestination.geometry?.location?.lng() || selectedDestination.longitude),
+        lat: Number(destinationLat),
+        lng: Number(destinationLng),
       };
 
       directionsService.route(

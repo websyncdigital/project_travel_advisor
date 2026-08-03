@@ -7,7 +7,9 @@ import Rating from '@material-ui/lab/Rating';
 import useStyles from './styles.js';
 
 const PlaceDetails = ({ place, selected, refProp, setSelectedDestination }) => {
-  if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  React.useEffect(() => {
+    if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [selected, refProp]);
   const classes = useStyles();
 
   let placeImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80';
