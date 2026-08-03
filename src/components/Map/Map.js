@@ -11,17 +11,13 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
 
-  const directionsRendererRef = React.useRef(null);
+  const polylineRef = React.useRef(null);
   const [internalMap, setInternalMap] = React.useState(null);
   const [routeError, setRouteError] = React.useState('');
+  const [routeInfo, setRouteInfo] = React.useState(null);
 
   React.useEffect(() => {
     if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
-      if (!directionsRendererRef.current) {
-        directionsRendererRef.current = new window.google.maps.DirectionsRenderer();
-        directionsRendererRef.current.setMap(internalMap);
-      }
-
       const directionsService = new window.google.maps.DirectionsService();
 
       const origin = { lat: coords.lat, lng: coords.lng };
@@ -46,7 +42,18 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         },
         (result, status) => {
           if (status === window.google.maps.DirectionsStatus.OK) {
-            directionsRendererRef.current.setDirections(result);
+            if (polylineRef.current) polylineRef.current.setMap(null);
+
+            polylineRef.current = new window.google.maps.Polyline({
+              path: result.routes[0].overview_path,
+              strokeColor: '#2196F3',
+              strokeOpacity: 0.8,
+              strokeWeight: 6,
+            });
+            polylineRef.current.setMap(internalMap);
+            internalMap.fitBounds(result.routes[0].bounds);
+
+            setRouteInfo(result.routes[0].legs[0].distance.text);
             setRouteError('');
           } else {
             // eslint-disable-next-line no-console
@@ -55,11 +62,13 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           }
         },
       );
-    } else if (directionsRendererRef.current) {
-      directionsRendererRef.current.setDirections({ routes: [] });
+    } else if (polylineRef.current) {
+      polylineRef.current.setMap(null);
+      setRouteInfo(null);
       setRouteError('');
     }
-  }, [selectedDestination, coords, internalMap]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDestination, internalMap]);
 
   const getAqiColor = (category) => {
     if (!category) return 'black';
@@ -74,6 +83,11 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
       {routeError && (
         <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10, backgroundColor: 'red', color: 'white', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold' }}>
           Route Error: {routeError} - Please check if Directions API is enabled in Google Cloud Console!
+        </div>
+      )}
+      {routeInfo && (
+        <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10, backgroundColor: '#2196F3', color: 'white', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold', boxShadow: '0 2px 4px rgba(0,0,0,0.2)' }}>
+          Route Distance: {routeInfo}
         </div>
       )}
       <GoogleMapReact
