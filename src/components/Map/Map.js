@@ -156,43 +156,45 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
               )}
           </div>
         ))}
-        {(weatherData || locationName || timeZoneId) && (
-          <div lat={coords.lat} lng={coords.lng} style={{ zIndex: 1, position: 'absolute', transform: 'translate(-50%, -50%)', minWidth: '150px' }}>
-            <Paper elevation={3} style={{ padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.95)' }}>
-
-              {locationName && (
-                <Typography variant="subtitle2" style={{ fontWeight: 'bold', textAlign: 'center' }}>
-                  Exploring: {locationName}
-                </Typography>
-              )}
-
-              {timeZoneId && (
-                <Typography variant="caption" color="textSecondary">
-                  Local Time: {new Date().toLocaleTimeString('en-US', { timeZone: timeZoneId, hour: '2-digit', minute: '2-digit' })}
-                </Typography>
-              )}
-
-              {weatherData?.weatherCondition && (
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="35px" />
-                  {weatherData.temperature && (
-                    <Typography variant="subtitle1" style={{ fontWeight: 'bold', paddingRight: '5px' }}>
-                      {Math.round(weatherData.temperature.degrees)}°C
-                    </Typography>
-                  )}
-                </div>
-              )}
-
-              {airQuality && (
-                <Typography variant="caption" style={{ fontWeight: 'bold', color: getAqiColor(airQuality.category) }}>
-                  AQI: {airQuality.category}
-                </Typography>
-              )}
-
-            </Paper>
-          </div>
-        )}
+        {/* Moving the Exploring widget OUTSIDE of GoogleMapReact so it acts as an absolute overlay instead of a map marker */}
       </GoogleMapReact>
+
+      {(weatherData || locationName || timeZoneId) && (
+        <div style={{ position: 'absolute', bottom: '40px', left: '20px', zIndex: 5, minWidth: '150px' }}>
+          <Paper elevation={3} style={{ padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.95)', boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }}>
+
+            {locationName && (
+              <Typography variant="subtitle2" style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                Exploring: {locationName}
+              </Typography>
+            )}
+
+            {timeZoneId && (
+              <Typography variant="caption" color="textSecondary">
+                Local Time: {new Date().toLocaleTimeString('en-US', { timeZone: timeZoneId, hour: '2-digit', minute: '2-digit' })}
+              </Typography>
+            )}
+
+            {weatherData?.weatherCondition && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="35px" />
+                {weatherData.temperature && (
+                  <Typography variant="subtitle1" style={{ fontWeight: 'bold', paddingRight: '5px' }}>
+                    {Math.round(weatherData.temperature.degrees)}°C
+                  </Typography>
+                )}
+              </div>
+            )}
+
+            {airQuality && (
+              <Typography variant="caption" style={{ fontWeight: 'bold', color: getAqiColor(airQuality.category) }}>
+                AQI: {airQuality.category}
+              </Typography>
+            )}
+
+          </Paper>
+        </div>
+      )}
     </div>
   );
 };
