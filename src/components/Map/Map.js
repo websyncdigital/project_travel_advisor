@@ -42,7 +42,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap }) 
                   <Typography className={classes.typography} variant="subtitle2" gutterBottom> {place.name}</Typography>
                   <img
                     className={classes.pointer}
-                    src={place.photos ? place.photos[0].getUrl() : 'https://www.foodserviceandhospitality.com/wp-content/uploads/2016/09/Restaurant-Placeholder-001.jpg'}
+                    src={place.photos ? place.photos[0].getUrl() : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80'}
                     alt={place.name}
                   />
                   <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
