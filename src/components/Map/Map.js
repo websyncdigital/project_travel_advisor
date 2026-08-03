@@ -11,17 +11,16 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
 
-  const [directionsRenderer, setDirectionsRenderer] = React.useState(null);
+  const directionsRendererRef = React.useRef(null);
   const [internalMap, setInternalMap] = React.useState(null);
 
   React.useEffect(() => {
-    if (directionsRenderer && internalMap) {
-      directionsRenderer.setMap(internalMap);
-    }
-  }, [directionsRenderer, internalMap]);
+    if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
+      if (!directionsRendererRef.current) {
+        directionsRendererRef.current = new window.google.maps.DirectionsRenderer({ preserveViewport: true });
+        directionsRendererRef.current.setMap(internalMap);
+      }
 
-  React.useEffect(() => {
-    if (selectedDestination && coords && window.google && window.google.maps && directionsRenderer) {
       const directionsService = new window.google.maps.DirectionsService();
 
       const origin = { lat: coords.lat, lng: coords.lng };
@@ -38,17 +37,17 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         },
         (result, status) => {
           if (status === window.google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(result);
+            directionsRendererRef.current.setDirections(result);
           } else {
             // eslint-disable-next-line no-console
             console.error(`Error fetching directions: ${status}`);
           }
         },
       );
-    } else if (directionsRenderer) {
-      directionsRenderer.setDirections({ routes: [] });
+    } else if (directionsRendererRef.current) {
+      directionsRendererRef.current.setDirections({ routes: [] });
     }
-  }, [selectedDestination, coords, directionsRenderer]);
+  }, [selectedDestination, coords, internalMap]);
 
   const getAqiColor = (category) => {
     if (!category) return 'black';
@@ -73,10 +72,9 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         }}
         onChildClick={(child) => setChildClicked(child)}
         yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={({ map, maps }) => {
+        onGoogleApiLoaded={({ map }) => {
           setMap(map);
           setInternalMap(map);
-          setDirectionsRenderer(new maps.DirectionsRenderer({ preserveViewport: true }));
         }}
       >
         {places.length > 0 && places.map((place, i) => (
