@@ -88,7 +88,7 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
           size="small"
           color={selectedDestination?.name === place.name ? 'default' : 'secondary'}
           variant="contained"
-          style={{ marginLeft: 'auto', marginRight: '5px' }}
+          style={{ marginLeft: 'auto' }}
           onClick={() => {
             if (selectedDestination?.name === place.name) {
               setSelectedDestination(null); // Clear Route
@@ -97,15 +97,7 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
             }
           }}
         >
-          {selectedDestination?.name === place.name ? 'Clear Route' : 'Draw Route'}
-        </Button>
-        <Button
-          size="small"
-          color="primary"
-          variant="contained"
-          onClick={() => window.open(directionsUrl, '_blank')}
-        >
-          📍 Get Directions
+          {selectedDestination?.name === place.name ? 'Clear Directions' : '📍 Get Directions'}
         </Button>
       </CardActions>
     </Card>

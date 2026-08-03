@@ -11,7 +11,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
 
-  const polylineRef = React.useRef(null);
+  const directionsRendererRef = React.useRef(null);
   const [internalMap, setInternalMap] = React.useState(null);
   const [routeError, setRouteError] = React.useState('');
   const [routeInfo, setRouteInfo] = React.useState(null);
@@ -69,15 +69,21 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         },
         (result, status) => {
           if (status === window.google.maps.DirectionsStatus.OK) {
-            if (polylineRef.current) polylineRef.current.setMap(null);
+            if (directionsRendererRef.current) directionsRendererRef.current.setMap(null);
 
-            polylineRef.current = new window.google.maps.Polyline({
-              path: result.routes[0].overview_path,
-              strokeColor: '#2196F3',
-              strokeOpacity: 0.8,
-              strokeWeight: 6,
+            directionsRendererRef.current = new window.google.maps.DirectionsRenderer({
+              suppressMarkers: true,
+              preserveViewport: true,
+              polylineOptions: { strokeColor: '#2196F3', strokeOpacity: 0.8, strokeWeight: 6 },
             });
-            polylineRef.current.setMap(internalMap);
+            directionsRendererRef.current.setMap(internalMap);
+            directionsRendererRef.current.setDirections(result);
+
+            const panel = document.getElementById('directions-panel');
+            if (panel) {
+              directionsRendererRef.current.setPanel(panel);
+            }
+
             internalMap.fitBounds(result.routes[0].bounds, 150); // Add 150px padding so markers don't get clipped!
 
             setRouteInfo(result.routes[0].legs[0].distance.text);
@@ -89,8 +95,11 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           }
         },
       );
-    } else if (polylineRef.current) {
-      polylineRef.current.setMap(null);
+    } else if (directionsRendererRef.current) {
+      directionsRendererRef.current.setMap(null);
+      if (document.getElementById('directions-panel')) {
+        document.getElementById('directions-panel').innerHTML = ''; // Clear panel
+      }
       setRouteInfo(null);
       setRouteError('');
     }
@@ -111,11 +120,25 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           Route Error: {routeError} - Please check if Directions API is enabled in Google Cloud Console!
         </div>
       )}
-      {routeInfo && (
-        <div style={infoBannerStyle}>
-          Route Distance: {routeInfo}
-        </div>
-      )}
+
+      {/* Turn-by-turn directions panel overlay */}
+      <Paper
+        elevation={4}
+        style={{
+          display: selectedDestination && routeInfo ? 'block' : 'none',
+          position: 'absolute',
+          top: '20px',
+          right: '20px',
+          width: '320px',
+          maxHeight: 'calc(100% - 40px)',
+          overflowY: 'auto',
+          zIndex: 10,
+          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          borderRadius: '10px',
+        }}
+      >
+        <div id="directions-panel" style={{ padding: '10px' }} />
+      </Paper>
       <GoogleMapReact
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAP_API_KEY, libraries: ['places'] }}
         defaultCenter={{ lat: 0, lng: 0 }}
