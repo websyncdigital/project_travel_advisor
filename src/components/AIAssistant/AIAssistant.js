@@ -115,8 +115,8 @@ const AIAssistant = () => {
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading || !chatSession}
             />
-            <IconButton 
-              type="submit" 
+            <IconButton
+              type="submit"
               className={classes.sendButton}
               disabled={!input.trim() || isLoading || !chatSession}
             >
