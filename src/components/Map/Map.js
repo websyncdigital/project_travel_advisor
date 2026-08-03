@@ -7,15 +7,15 @@ import Rating from '@material-ui/lab/Rating';
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
 
-const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherData }) => {
+const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap }) => {
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
 
   return (
     <div className={classes.mapContainer}>
       <GoogleMapReact
-        bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAP_API_KEY }}
-        defaultCenter={coords}
+        bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAP_API_KEY, libraries: ['places'] }}
+        defaultCenter={{ lat: 0, lng: 0 }}
         center={coords}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
@@ -25,12 +25,14 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherDat
           setBounds({ ne: e.marginBounds.ne, sw: e.marginBounds.sw });
         }}
         onChildClick={(child) => setChildClicked(child)}
+        yesIWantToUseGoogleMapApiInternals
+        onGoogleApiLoaded={({ map }) => setMap(map)}
       >
-        {places.length && places.map((place, i) => (
+        {places.length > 0 && places.map((place, i) => (
           <div
             className={classes.markerContainer}
-            lat={Number(place.latitude)}
-            lng={Number(place.longitude)}
+            lat={Number(place.geometry?.location?.lat() || place.latitude)}
+            lng={Number(place.geometry?.location?.lng() || place.longitude)}
             key={i}
           >
             {!matches
@@ -40,16 +42,12 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, weatherDat
                   <Typography className={classes.typography} variant="subtitle2" gutterBottom> {place.name}</Typography>
                   <img
                     className={classes.pointer}
-                    src={place.photo ? place.photo.images.large.url : 'https://www.foodserviceandhospitality.com/wp-content/uploads/2016/09/Restaurant-Placeholder-001.jpg'}
+                    src={place.photos ? place.photos[0].getUrl() : 'https://www.foodserviceandhospitality.com/wp-content/uploads/2016/09/Restaurant-Placeholder-001.jpg'}
+                    alt={place.name}
                   />
                   <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
                 </Paper>
               )}
-          </div>
-        ))}
-        {weatherData?.list?.length && weatherData.list.map((data, i) => (
-          <div key={i} lat={data.coord.lat} lng={data.coord.lon}>
-            <img src={`http://openweathermap.org/img/w/${data.weather[0].icon}.png`} height="70px" />
           </div>
         ))}
       </GoogleMapReact>

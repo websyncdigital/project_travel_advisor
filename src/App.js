@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CssBaseline, Grid } from '@material-ui/core';
 
-import { getPlacesData, getWeatherData } from './api/travelAdvisorAPI';
 import Header from './components/Header/Header';
 import List from './components/List/List';
 import Map from './components/Map/Map';
@@ -13,13 +12,13 @@ const App = () => {
   const [coords, setCoords] = useState({});
   const [bounds, setBounds] = useState(null);
 
-  const [weatherData, setWeatherData] = useState([]);
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
 
   const [autocomplete, setAutocomplete] = useState(null);
   const [childClicked, setChildClicked] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [map, setMap] = useState(null);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
@@ -28,35 +27,58 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = places.filter((place) => Number(place.rating) > rating);
+    const filtered = places.filter((place) => Number(place.rating) >= rating);
 
     setFilteredPlaces(filtered);
   }, [rating]);
 
   useEffect(() => {
-    if (bounds) {
+    if (bounds && map) {
       setIsLoading(true);
 
-      getWeatherData(coords.lat, coords.lng)
-        .then((data) => setWeatherData(data));
+      const service = new window.google.maps.places.PlacesService(map);
 
-      getPlacesData(type, bounds.sw, bounds.ne)
-        .then((data) => {
-          setPlaces(data.filter((place) => place.name && place.num_reviews > 0));
+      let mappedType = 'restaurant';
+      if (type === 'hotels') mappedType = 'lodging';
+      if (type === 'attractions') mappedType = 'tourist_attraction';
+
+      const request = {
+        bounds: new window.google.maps.LatLngBounds(
+          new window.google.maps.LatLng(bounds.sw.lat, bounds.sw.lng),
+          new window.google.maps.LatLng(bounds.ne.lat, bounds.ne.lng),
+        ),
+        type: [mappedType],
+      };
+
+      service.nearbySearch(request, (results, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
+          // Add dummy fields to match the old interface where possible
+          const transformedPlaces = results.map((p) => ({
+            ...p,
+            num_reviews: p.user_ratings_total || 0,
+          }));
+          setPlaces(transformedPlaces.filter((place) => place.name && place.num_reviews > 0));
           setFilteredPlaces([]);
           setRating('');
-          setIsLoading(false);
-        });
+        } else {
+          setPlaces([]);
+        }
+        setIsLoading(false);
+      });
     }
-  }, [bounds, type]);
+  }, [bounds, type, map]);
 
   const onLoad = (autoC) => setAutocomplete(autoC);
 
   const onPlaceChanged = () => {
-    const lat = autocomplete.getPlace().geometry.location.lat();
-    const lng = autocomplete.getPlace().geometry.location.lng();
-
-    setCoords({ lat, lng });
+    if (autocomplete !== null) {
+      const place = autocomplete.getPlace();
+      if (place && place.geometry) {
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        setCoords({ lat, lng });
+      }
+    }
   };
 
   return (
@@ -82,7 +104,7 @@ const App = () => {
             setCoords={setCoords}
             coords={coords}
             places={filteredPlaces.length ? filteredPlaces : places}
-            weatherData={weatherData}
+            setMap={setMap}
           />
         </Grid>
       </Grid>
