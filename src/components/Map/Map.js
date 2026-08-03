@@ -78,7 +78,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
               strokeWeight: 6,
             });
             polylineRef.current.setMap(internalMap);
-            internalMap.fitBounds(result.routes[0].bounds);
+            internalMap.fitBounds(result.routes[0].bounds, 150); // Add 150px padding so markers don't get clipped!
 
             setRouteInfo(result.routes[0].legs[0].distance.text);
             setRouteError('');

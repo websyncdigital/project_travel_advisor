@@ -6,7 +6,7 @@ import Rating from '@material-ui/lab/Rating';
 
 import useStyles from './styles.js';
 
-const PlaceDetails = ({ place, selected, refProp, setSelectedDestination }) => {
+const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, selectedDestination }) => {
   React.useEffect(() => {
     if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [selected, refProp]);
@@ -86,12 +86,18 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination }) => {
         )}
         <Button
           size="small"
-          color="secondary"
+          color={selectedDestination?.name === place.name ? 'default' : 'secondary'}
           variant="contained"
           style={{ marginLeft: 'auto', marginRight: '5px' }}
-          onClick={() => setSelectedDestination(place)}
+          onClick={() => {
+            if (selectedDestination?.name === place.name) {
+              setSelectedDestination(null); // Clear Route
+            } else {
+              setSelectedDestination(place); // Draw Route
+            }
+          }}
         >
-          Draw Route
+          {selectedDestination?.name === place.name ? 'Clear Route' : 'Draw Route'}
         </Button>
         <Button
           size="small"
