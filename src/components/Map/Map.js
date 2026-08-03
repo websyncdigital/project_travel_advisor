@@ -94,7 +94,6 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
       setRouteInfo(null);
       setRouteError('');
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDestination, internalMap]);
 
   const getAqiColor = (category) => {
