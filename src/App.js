@@ -27,10 +27,13 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = places.filter((place) => Number(place.rating) >= rating);
-
-    setFilteredPlaces(filtered);
-  }, [rating]);
+    if (rating) {
+      const filtered = places.filter((place) => Number(place.rating) >= rating);
+      setFilteredPlaces(filtered);
+    } else {
+      setFilteredPlaces([]);
+    }
+  }, [rating, places]);
 
   useEffect(() => {
     if (bounds && map) {
@@ -57,7 +60,7 @@ const App = () => {
             ...p,
             num_reviews: p.user_ratings_total || 0,
           }));
-          setPlaces(transformedPlaces.filter((place) => place.name && place.num_reviews > 0));
+          setPlaces(transformedPlaces.filter((place) => place.name));
           setFilteredPlaces([]);
           setRating('');
         } else {
