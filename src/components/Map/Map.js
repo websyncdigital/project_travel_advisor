@@ -29,20 +29,6 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
     fontWeight: 'bold',
   };
 
-  const infoBannerStyle = {
-    position: 'absolute',
-    top: 10,
-    left: '50%',
-    transform: 'translateX(-50%)',
-    zIndex: 10,
-    backgroundColor: '#2196F3',
-    color: 'white',
-    padding: '10px 20px',
-    borderRadius: '5px',
-    fontWeight: 'bold',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-  };
-
   React.useEffect(() => {
     if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
       const directionsService = new window.google.maps.DirectionsService();

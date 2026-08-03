@@ -19,8 +19,6 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
     placeImage = `https://maps.googleapis.com/maps/api/streetview?size=400x400&location=${place.geometry?.location?.lat()},${place.geometry?.location?.lng()}&key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`;
   }
 
-  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.geometry?.location?.lat()},${place.geometry?.location?.lng()}`;
-
   return (
     <Card elevation={6}>
       <CardMedia
