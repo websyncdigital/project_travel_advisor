@@ -13,6 +13,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
 
   const directionsRendererRef = React.useRef(null);
   const [internalMap, setInternalMap] = React.useState(null);
+  const [routeError, setRouteError] = React.useState('');
 
   React.useEffect(() => {
     if (selectedDestination && coords && window.google && window.google.maps && internalMap) {
@@ -46,14 +47,17 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         (result, status) => {
           if (status === window.google.maps.DirectionsStatus.OK) {
             directionsRendererRef.current.setDirections(result);
+            setRouteError('');
           } else {
             // eslint-disable-next-line no-console
             console.error(`Error fetching directions: ${status}`);
+            setRouteError(status);
           }
         },
       );
     } else if (directionsRendererRef.current) {
       directionsRendererRef.current.setDirections({ routes: [] });
+      setRouteError('');
     }
   }, [selectedDestination, coords, internalMap]);
 
@@ -66,7 +70,12 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   };
 
   return (
-    <div className={classes.mapContainer}>
+    <div className={classes.mapContainer} style={{ position: 'relative' }}>
+      {routeError && (
+        <div style={{ position: 'absolute', top: 10, left: '50%', transform: 'translateX(-50%)', zIndex: 10, backgroundColor: 'red', color: 'white', padding: '10px 20px', borderRadius: '5px', fontWeight: 'bold' }}>
+          Route Error: {routeError} - Please check if Directions API is enabled in Google Cloud Console!
+        </div>
+      )}
       <GoogleMapReact
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAP_API_KEY, libraries: ['places'] }}
         defaultCenter={{ lat: 0, lng: 0 }}
