@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Paper, Typography, InputBase, IconButton, Fab } from '@material-ui/core';
-import { MessageCircle, X, Send } from 'lucide-react';
+import { Send, Chat as MessageCircle, Close as X } from '@material-ui/icons';
 import { startTravelChat } from '../../api/ai';
 import useStyles from './styles';
 
@@ -83,7 +83,7 @@ const AIAssistant = () => {
               Travel Advisor AI
             </Typography>
             <IconButton size="small" onClick={() => setIsOpen(false)} style={{ color: 'white' }}>
-              <X size={20} />
+              <X fontSize="small" />
             </IconButton>
           </div>
 
@@ -115,12 +115,12 @@ const AIAssistant = () => {
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading || !chatSession}
             />
-            <IconButton
-              type="submit"
+            <IconButton 
+              type="submit" 
               className={classes.sendButton}
               disabled={!input.trim() || isLoading || !chatSession}
             >
-              <Send size={20} />
+              <Send fontSize="small" />
             </IconButton>
           </form>
         </Paper>
