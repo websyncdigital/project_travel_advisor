@@ -15,6 +15,9 @@ const App = () => {
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
+  const [airQuality, setAirQuality] = useState(null);
+  const [timeZoneId, setTimeZoneId] = useState(null);
+  const [locationName, setLocationName] = useState('');
 
   const [autocomplete, setAutocomplete] = useState(null);
   const [childClicked, setChildClicked] = useState(null);
@@ -29,11 +32,48 @@ const App = () => {
 
   useEffect(() => {
     if (coords.lat && coords.lng) {
+      // 1. Weather API
       fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}&location.latitude=${coords.lat}&location.longitude=${coords.lng}`)
         .then((response) => response.json())
         .then((data) => setWeatherData(data))
         // eslint-disable-next-line no-console
         .catch((error) => console.error('Weather API error:', error));
+
+      // 2. Air Quality API
+      fetch(`https://airquality.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ location: { latitude: coords.lat, longitude: coords.lng } }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data && data.indexes && data.indexes.length > 0) {
+            setAirQuality(data.indexes[0]);
+          }
+        })
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error('Air Quality API error:', error));
+
+      // 3. Time Zone API
+      fetch(`https://maps.googleapis.com/maps/api/timezone/json?location=${coords.lat},${coords.lng}&timestamp=${Math.floor(Date.now() / 1000)}&key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.status === 'OK') setTimeZoneId(data.timeZoneId);
+        })
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error('Time Zone API error:', error));
+
+      // 4. Geocoding API (using the loaded Google Maps script)
+      if (window.google && window.google.maps && window.google.maps.Geocoder) {
+        const geocoder = new window.google.maps.Geocoder();
+        geocoder.geocode({ location: coords }, (results, status) => {
+          if (status === 'OK' && results[0]) {
+            // Find a locality (city) or administrative area
+            const cityResult = results.find((r) => r.types.includes('locality')) || results[0];
+            setLocationName(cityResult.formatted_address.split(',')[0]);
+          }
+        });
+      }
     }
   }, [coords]);
 
@@ -120,6 +160,9 @@ const App = () => {
             places={filteredPlaces.length ? filteredPlaces : places}
             setMap={setMap}
             weatherData={weatherData}
+            airQuality={airQuality}
+            timeZoneId={timeZoneId}
+            locationName={locationName}
           />
         </Grid>
       </Grid>

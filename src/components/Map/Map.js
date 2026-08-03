@@ -7,9 +7,17 @@ import Rating from '@material-ui/lab/Rating';
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
 
-const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, weatherData }) => {
+const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, weatherData, airQuality, timeZoneId, locationName }) => {
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
+
+  const getAqiColor = (category) => {
+    if (!category) return 'black';
+    const cat = category.toLowerCase();
+    if (cat.includes('good')) return 'green';
+    if (cat.includes('moderate')) return 'orange';
+    return 'red';
+  };
 
   return (
     <div className={classes.mapContainer}>
@@ -50,15 +58,39 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
               )}
           </div>
         ))}
-        {weatherData?.weatherCondition && (
-          <div lat={coords.lat} lng={coords.lng} style={{ zIndex: 1, position: 'absolute', transform: 'translate(-50%, -50%)' }}>
-            <Paper elevation={3} style={{ padding: '5px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.9)' }}>
-              <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="35px" />
-              {weatherData.temperature && (
-                <Typography variant="subtitle1" style={{ fontWeight: 'bold', paddingRight: '5px' }}>
-                  {Math.round(weatherData.temperature.degrees)}°C
+        {(weatherData || locationName || timeZoneId) && (
+          <div lat={coords.lat} lng={coords.lng} style={{ zIndex: 1, position: 'absolute', transform: 'translate(-50%, -50%)', minWidth: '150px' }}>
+            <Paper elevation={3} style={{ padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.95)' }}>
+
+              {locationName && (
+                <Typography variant="subtitle2" style={{ fontWeight: 'bold', textAlign: 'center' }}>
+                  Exploring: {locationName}
                 </Typography>
               )}
+
+              {timeZoneId && (
+                <Typography variant="caption" color="textSecondary">
+                  Local Time: {new Date().toLocaleTimeString('en-US', { timeZone: timeZoneId, hour: '2-digit', minute: '2-digit' })}
+                </Typography>
+              )}
+
+              {weatherData?.weatherCondition && (
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="35px" />
+                  {weatherData.temperature && (
+                    <Typography variant="subtitle1" style={{ fontWeight: 'bold', paddingRight: '5px' }}>
+                      {Math.round(weatherData.temperature.degrees)}°C
+                    </Typography>
+                  )}
+                </div>
+              )}
+
+              {airQuality && (
+                <Typography variant="caption" style={{ fontWeight: 'bold', color: getAqiColor(airQuality.category) }}>
+                  AQI: {airQuality.category}
+                </Typography>
+              )}
+
             </Paper>
           </div>
         )}

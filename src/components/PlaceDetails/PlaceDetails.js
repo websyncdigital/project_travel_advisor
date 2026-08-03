@@ -10,11 +10,20 @@ const PlaceDetails = ({ place, selected, refProp }) => {
   if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const classes = useStyles();
 
+  let placeImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80';
+  if (place.photos) {
+    placeImage = place.photos[0].getUrl();
+  } else if (place.geometry) {
+    placeImage = `https://maps.googleapis.com/maps/api/streetview?size=400x400&location=${place.geometry?.location?.lat()},${place.geometry?.location?.lng()}&key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`;
+  }
+
+  const directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.geometry?.location?.lat()},${place.geometry?.location?.lng()}`;
+
   return (
     <Card elevation={6}>
       <CardMedia
         style={{ height: 350 }}
-        image={place.photos ? place.photos[0].getUrl() : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80'}
+        image={placeImage}
         title={place.name}
       />
       <CardContent>
@@ -73,6 +82,15 @@ const PlaceDetails = ({ place, selected, refProp }) => {
             Website
           </Button>
         )}
+        <Button
+          size="small"
+          color="primary"
+          variant="contained"
+          style={{ marginLeft: 'auto' }}
+          onClick={() => window.open(directionsUrl, '_blank')}
+        >
+          📍 Get Directions
+        </Button>
       </CardActions>
     </Card>
   );
