@@ -4,7 +4,7 @@ import { Send, Chat as MessageCircle, Close as X } from '@material-ui/icons';
 import { startTravelChat } from '../../api/ai';
 import useStyles from './styles';
 
-const AIAssistant = () => {
+const AIAssistant = ({ coords, locationName, places }) => {
   const classes = useStyles();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -26,7 +26,7 @@ const AIAssistant = () => {
   useEffect(() => {
     if (isOpen && !chatSession) {
       try {
-        const session = startTravelChat();
+        const session = startTravelChat({ coords, locationName, places });
         setChatSession(session);
       } catch (error) {
         // eslint-disable-next-line no-console

@@ -4,8 +4,26 @@ const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 // Initialize the model with Google Search Grounding to fetch real-time location data
-const getGroundedModel = () => {
+const getGroundedModel = (context) => {
   if (!genAI) throw new Error('Missing Gemini API Key in .env file.');
+
+  let instruction = 'You are an expert travel advisor AI built directly into the Travel Advisor application. '
+    + 'You MUST provide highly specific, location-aware answers based on the user\'s current state in the app. '
+    + 'Use your Google Grounding tools to find the best routes, restaurants, hotels, and attractions. '
+    + 'Keep your answers concise, formatted in markdown, and highly enthusiastic! ';
+
+  if (context) {
+    const { coords, locationName, places } = context;
+    if (coords && coords.lat && coords.lng) {
+      instruction += `\n\nCRITICAL CONTEXT: The user is currently physically located at Latitude: ${coords.lat}, Longitude: ${coords.lng}`;
+      if (locationName) instruction += ` (City: ${locationName})`;
+      instruction += '. If they ask for directions, routing, or "near me", you MUST calculate it starting exactly from these coordinates!';
+    }
+    if (places && places.length > 0) {
+      const placeNames = places.slice(0, 10).map((p) => p.name).join(', ');
+      instruction += `\n\nThe user is currently looking at a map displaying these places: ${placeNames}.`;
+    }
+  }
 
   return genAI.getGenerativeModel({
     model: 'gemini-3.6-flash',
@@ -14,16 +32,12 @@ const getGroundedModel = () => {
         googleSearch: {},
       },
     ],
-    systemInstruction:
-      'You are an expert travel advisor AI built into a map application. '
-      + 'Use your Google Grounding tools to find the best restaurants, hotels, and attractions. '
-      + 'Keep your answers concise, formatted in markdown, and highly enthusiastic! '
-      + 'If asked about a location, always try to provide specific real-world recommendations.',
+    systemInstruction: instruction,
   });
 };
 
-export const startTravelChat = () => {
-  const model = getGroundedModel();
+export const startTravelChat = (context) => {
+  const model = getGroundedModel(context);
   return model.startChat({
     history: [
       {

@@ -170,7 +170,7 @@ const App = () => {
           />
         </Grid>
       </Grid>
-      <AIAssistant />
+      <AIAssistant coords={coords} locationName={locationName} places={places} />
     </>
   );
 };
