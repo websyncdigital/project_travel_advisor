@@ -47,7 +47,7 @@ const App = () => {
           new window.google.maps.LatLng(bounds.sw.lat, bounds.sw.lng),
           new window.google.maps.LatLng(bounds.ne.lat, bounds.ne.lng),
         ),
-        type: [mappedType],
+        type: mappedType,
       };
 
       service.nearbySearch(request, (results, status) => {
