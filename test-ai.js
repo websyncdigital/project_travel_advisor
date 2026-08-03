@@ -13,7 +13,12 @@ const genAI = new GoogleGenerativeAI(apiKey);
 async function test() {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-pro",
+      model: "gemini-3.6-flash",
+      tools: [
+        {
+          googleSearch: {},
+        },
+      ],
     });
 
     const chatSession = model.startChat({});
