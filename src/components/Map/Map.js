@@ -7,7 +7,7 @@ import Rating from '@material-ui/lab/Rating';
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
 
-const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap }) => {
+const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, weatherData }) => {
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
 
@@ -50,6 +50,18 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap }) 
               )}
           </div>
         ))}
+        {weatherData?.weatherCondition && (
+          <div lat={coords.lat} lng={coords.lng} style={{ zIndex: 1, position: 'absolute', transform: 'translate(-50%, -50%)' }}>
+            <Paper elevation={3} style={{ padding: '5px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '15px', backgroundColor: 'rgba(255,255,255,0.9)' }}>
+              <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="35px" />
+              {weatherData.temperature && (
+                <Typography variant="subtitle1" style={{ fontWeight: 'bold', paddingRight: '5px' }}>
+                  {Math.round(weatherData.temperature.degrees)}°C
+                </Typography>
+              )}
+            </Paper>
+          </div>
+        )}
       </GoogleMapReact>
     </div>
   );

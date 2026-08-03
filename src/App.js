@@ -14,6 +14,7 @@ const App = () => {
 
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
+  const [weatherData, setWeatherData] = useState(null);
 
   const [autocomplete, setAutocomplete] = useState(null);
   const [childClicked, setChildClicked] = useState(null);
@@ -25,6 +26,15 @@ const App = () => {
       setCoords({ lat: latitude, lng: longitude });
     });
   }, []);
+
+  useEffect(() => {
+    if (coords.lat && coords.lng) {
+      fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}&location.latitude=${coords.lat}&location.longitude=${coords.lng}`)
+        .then((response) => response.json())
+        .then((data) => setWeatherData(data))
+        .catch((error) => console.error("Weather API error:", error));
+    }
+  }, [coords]);
 
   useEffect(() => {
     if (rating) {
@@ -108,6 +118,7 @@ const App = () => {
             coords={coords}
             places={filteredPlaces.length ? filteredPlaces : places}
             setMap={setMap}
+            weatherData={weatherData}
           />
         </Grid>
       </Grid>
