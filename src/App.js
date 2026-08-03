@@ -32,7 +32,8 @@ const App = () => {
       fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}&location.latitude=${coords.lat}&location.longitude=${coords.lng}`)
         .then((response) => response.json())
         .then((data) => setWeatherData(data))
-        .catch((error) => console.error("Weather API error:", error));
+        // eslint-disable-next-line no-console
+        .catch((error) => console.error('Weather API error:', error));
     }
   }, [coords]);
 
