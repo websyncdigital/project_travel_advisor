@@ -7,9 +7,54 @@ import Rating from '@material-ui/lab/Rating';
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
 
-const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, weatherData, airQuality, timeZoneId, locationName }) => {
+const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, weatherData, airQuality, timeZoneId, locationName, selectedDestination }) => {
   const matches = useMediaQuery('(min-width:600px)');
   const classes = useStyles();
+
+  const [directionsRenderer, setDirectionsRenderer] = React.useState(null);
+  const [internalMap, setInternalMap] = React.useState(null);
+
+  React.useEffect(() => {
+    if (window.google && window.google.maps) {
+      setDirectionsRenderer(new window.google.maps.DirectionsRenderer());
+    }
+  }, []);
+
+  React.useEffect(() => {
+    if (directionsRenderer && internalMap) {
+      directionsRenderer.setMap(internalMap);
+    }
+  }, [directionsRenderer, internalMap]);
+
+  React.useEffect(() => {
+    if (selectedDestination && coords && window.google && window.google.maps && directionsRenderer) {
+      const directionsService = new window.google.maps.DirectionsService();
+
+      const origin = { lat: coords.lat, lng: coords.lng };
+      const destination = {
+        lat: Number(selectedDestination.geometry?.location?.lat() || selectedDestination.latitude),
+        lng: Number(selectedDestination.geometry?.location?.lng() || selectedDestination.longitude),
+      };
+
+      directionsService.route(
+        {
+          origin,
+          destination,
+          travelMode: window.google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          if (status === window.google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result);
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(`Error fetching directions: ${status}`);
+          }
+        },
+      );
+    } else if (directionsRenderer) {
+      directionsRenderer.setDirections({ routes: [] });
+    }
+  }, [selectedDestination, coords, directionsRenderer]);
 
   const getAqiColor = (category) => {
     if (!category) return 'black';
@@ -34,7 +79,10 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         }}
         onChildClick={(child) => setChildClicked(child)}
         yesIWantToUseGoogleMapApiInternals
-        onGoogleApiLoaded={({ map }) => setMap(map)}
+        onGoogleApiLoaded={({ map }) => {
+          setMap(map);
+          setInternalMap(map);
+        }}
       >
         {places.length > 0 && places.map((place, i) => (
           <div

@@ -23,6 +23,7 @@ const App = () => {
   const [childClicked, setChildClicked] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState(null);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
@@ -149,6 +150,7 @@ const App = () => {
             setType={setType}
             rating={rating}
             setRating={setRating}
+            setSelectedDestination={setSelectedDestination}
           />
         </Grid>
         <Grid item xs={12} md={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -163,6 +165,7 @@ const App = () => {
             airQuality={airQuality}
             timeZoneId={timeZoneId}
             locationName={locationName}
+            selectedDestination={selectedDestination}
           />
         </Grid>
       </Grid>

@@ -6,7 +6,7 @@ import Rating from '@material-ui/lab/Rating';
 
 import useStyles from './styles.js';
 
-const PlaceDetails = ({ place, selected, refProp }) => {
+const PlaceDetails = ({ place, selected, refProp, setSelectedDestination }) => {
   if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   const classes = useStyles();
 
@@ -84,9 +84,17 @@ const PlaceDetails = ({ place, selected, refProp }) => {
         )}
         <Button
           size="small"
+          color="secondary"
+          variant="contained"
+          style={{ marginLeft: 'auto', marginRight: '5px' }}
+          onClick={() => setSelectedDestination(place)}
+        >
+          Draw Route
+        </Button>
+        <Button
+          size="small"
           color="primary"
           variant="contained"
-          style={{ marginLeft: 'auto' }}
           onClick={() => window.open(directionsUrl, '_blank')}
         >
           📍 Get Directions
