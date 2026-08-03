@@ -16,7 +16,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
 
   React.useEffect(() => {
     if (window.google && window.google.maps) {
-      setDirectionsRenderer(new window.google.maps.DirectionsRenderer());
+      setDirectionsRenderer(new window.google.maps.DirectionsRenderer({ preserveViewport: true }));
     }
   }, []);
 
