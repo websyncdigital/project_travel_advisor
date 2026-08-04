@@ -114,8 +114,6 @@ const App = () => {
             num_reviews: p.user_ratings_total || 0,
           }));
           setPlaces(transformedPlaces.filter((place) => place.name));
-          setFilteredPlaces([]);
-          setRating('');
         } else {
           setPlaces([]);
         }
@@ -146,7 +144,7 @@ const App = () => {
           <List
             isLoading={isLoading}
             childClicked={childClicked}
-            places={filteredPlaces.length ? filteredPlaces : places}
+            places={rating ? filteredPlaces : places}
             type={type}
             setType={setType}
             rating={rating}
@@ -161,7 +159,7 @@ const App = () => {
             setBounds={setBounds}
             setCoords={setCoords}
             coords={coords}
-            places={filteredPlaces.length ? filteredPlaces : places}
+            places={rating ? filteredPlaces : places}
             setMap={setMap}
             weatherData={weatherData}
             airQuality={airQuality}
