@@ -73,14 +73,14 @@ const App = () => {
             let cityName = '';
             // Try to find the exact name from address components to avoid plus codes
             results.some((result) => {
-              const locality = result.address_components.find((c) => c.types.includes('locality'));
-              if (locality) { cityName = locality.long_name; return true; }
+              const neighborhood = result.address_components.find((c) => c.types.includes('neighborhood'));
+              if (neighborhood) { cityName = neighborhood.long_name; return true; }
 
               const sublocality = result.address_components.find((c) => c.types.includes('sublocality'));
               if (sublocality) { cityName = sublocality.long_name; return true; }
 
-              const neighborhood = result.address_components.find((c) => c.types.includes('neighborhood'));
-              if (neighborhood) { cityName = neighborhood.long_name; return true; }
+              const locality = result.address_components.find((c) => c.types.includes('locality'));
+              if (locality) { cityName = locality.long_name; return true; }
               return false;
             });
 
