@@ -70,8 +70,12 @@ const App = () => {
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: coords }, (results, status) => {
           if (status === 'OK' && results[0]) {
-            // Find a locality (city) or administrative area
-            const cityResult = results.find((r) => r.types.includes('locality')) || results[0];
+            // Find a locality, sublocality, or neighborhood, avoiding plus codes if possible
+            const cityResult = results.find((r) => r.types.includes('locality'))
+              || results.find((r) => r.types.includes('sublocality'))
+              || results.find((r) => r.types.includes('neighborhood'))
+              || results.find((r) => !r.types.includes('plus_code'))
+              || results[0];
             setLocationName(cityResult.formatted_address.split(',')[0]);
           }
         });
