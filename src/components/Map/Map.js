@@ -165,6 +165,11 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
               )}
           </div>
         ))}
+        {weatherData?.weatherCondition && (
+          <div lat={coords.lat} lng={coords.lng}>
+            <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="70px" />
+          </div>
+        )}
         {/* Moving the Exploring widget OUTSIDE of GoogleMapReact so it acts as an absolute overlay instead of a map marker */}
       </GoogleMapReact>
 
