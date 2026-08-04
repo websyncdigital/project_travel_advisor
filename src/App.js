@@ -70,13 +70,30 @@ const App = () => {
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: coords }, (results, status) => {
           if (status === 'OK' && results[0]) {
-            // Find a locality, sublocality, or neighborhood, avoiding plus codes if possible
-            const cityResult = results.find((r) => r.types.includes('locality'))
-              || results.find((r) => r.types.includes('sublocality'))
-              || results.find((r) => r.types.includes('neighborhood'))
-              || results.find((r) => !r.types.includes('plus_code'))
-              || results[0];
-            setLocationName(cityResult.formatted_address.split(',')[0]);
+            let cityName = '';
+            // Try to find the exact name from address components to avoid plus codes
+            for (const result of results) {
+              const locality = result.address_components.find(c => c.types.includes('locality'));
+              if (locality) { cityName = locality.long_name; break; }
+              
+              const sublocality = result.address_components.find(c => c.types.includes('sublocality'));
+              if (sublocality) { cityName = sublocality.long_name; break; }
+              
+              const neighborhood = result.address_components.find(c => c.types.includes('neighborhood'));
+              if (neighborhood) { cityName = neighborhood.long_name; break; }
+            }
+
+            // Fallback if no specific component was found
+            if (!cityName) {
+              const fallback = results.find((r) => !r.types.includes('plus_code')) || results[0];
+              const parts = fallback.formatted_address.split(',');
+              cityName = parts[0];
+              // If the first part looks like a plus code (contains '+'), use the second part
+              if (cityName.includes('+') && parts.length > 1) {
+                cityName = parts[1].trim();
+              }
+            }
+            setLocationName(cityName);
           }
         });
       }
