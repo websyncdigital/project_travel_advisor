@@ -72,25 +72,27 @@ const App = () => {
           if (status === 'OK' && results[0]) {
             let cityName = '';
             // Try to find the exact name from address components to avoid plus codes
-            for (const result of results) {
-              const locality = result.address_components.find(c => c.types.includes('locality'));
-              if (locality) { cityName = locality.long_name; break; }
-              
-              const sublocality = result.address_components.find(c => c.types.includes('sublocality'));
-              if (sublocality) { cityName = sublocality.long_name; break; }
-              
-              const neighborhood = result.address_components.find(c => c.types.includes('neighborhood'));
-              if (neighborhood) { cityName = neighborhood.long_name; break; }
-            }
+            results.some((result) => {
+              const locality = result.address_components.find((c) => c.types.includes('locality'));
+              if (locality) { cityName = locality.long_name; return true; }
+
+              const sublocality = result.address_components.find((c) => c.types.includes('sublocality'));
+              if (sublocality) { cityName = sublocality.long_name; return true; }
+
+              const neighborhood = result.address_components.find((c) => c.types.includes('neighborhood'));
+              if (neighborhood) { cityName = neighborhood.long_name; return true; }
+              return false;
+            });
 
             // Fallback if no specific component was found
             if (!cityName) {
               const fallback = results.find((r) => !r.types.includes('plus_code')) || results[0];
               const parts = fallback.formatted_address.split(',');
-              cityName = parts[0];
+              const [firstPart, secondPart] = parts;
+              cityName = firstPart;
               // If the first part looks like a plus code (contains '+'), use the second part
-              if (cityName.includes('+') && parts.length > 1) {
-                cityName = parts[1].trim();
+              if (cityName.includes('+') && secondPart) {
+                cityName = secondPart.trim();
               }
             }
             setLocationName(cityName);
