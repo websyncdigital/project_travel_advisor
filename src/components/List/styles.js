@@ -41,7 +41,7 @@ export default makeStyles((theme) => ({
     opacity: 0.8,
     '&:hover': {
       opacity: 1,
-    }
+    },
   },
   iconItemGrid: {
     display: 'flex',
@@ -51,7 +51,7 @@ export default makeStyles((theme) => ({
     opacity: 0.8,
     '&:hover': {
       opacity: 1,
-    }
+    },
   },
   iconCircle: {
     width: '60px',
@@ -90,6 +90,6 @@ export default makeStyles((theme) => ({
   bgDefault: { backgroundColor: '#607987' },
   activeIcon: {
     opacity: 1,
-    boxShadow: '0px 4px 8px rgba(0,0,0,0.2)'
-  }
+    boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
+  },
 }));
