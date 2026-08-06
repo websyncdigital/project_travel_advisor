@@ -24,5 +24,13 @@ export default makeStyles(() => ({
   chipActive: {
     boxShadow: '0 2px 6px rgba(0,0,0,0.2)',
     fontWeight: 'bold',
+    backgroundColor: '#1976d2 !important',
+    color: 'white !important',
+    '& *': {
+      color: 'white !important',
+    },
+    '&:hover': {
+      backgroundColor: '#115293 !important',
+    },
   },
 }));

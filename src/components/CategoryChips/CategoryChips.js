@@ -13,26 +13,41 @@ import LocalPostOfficeIcon from '@material-ui/icons/LocalPostOffice';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import ExploreIcon from '@material-ui/icons/Explore';
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import LocalPharmacyIcon from '@material-ui/icons/LocalPharmacy';
+import LocalAtmIcon from '@material-ui/icons/LocalAtm';
+import MuseumIcon from '@material-ui/icons/Museum';
+import DirectionsTransitIcon from '@material-ui/icons/DirectionsTransit';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
 import useStyles from './styles.js';
 
 const CategoryChips = ({ type, setType, rating, setRating }) => {
   const classes = useStyles();
   const [ratingAnchorEl, setRatingAnchorEl] = useState(null);
+  const [moreAnchorEl, setMoreAnchorEl] = useState(null);
 
-  const categories = [
+  const primaryCategories = [
     { value: 'restaurants', label: 'Restaurants', icon: <RestaurantIcon /> },
     { value: 'hotels', label: 'Hotels', icon: <HotelIcon /> },
     { value: 'attractions', label: 'Things to do', icon: <ExploreIcon /> },
+    { value: 'pharmacies', label: 'Pharmacies', icon: <LocalPharmacyIcon /> },
+    { value: 'atms', label: 'ATMs', icon: <LocalAtmIcon /> },
+    { value: 'gas stations', label: 'Gas', icon: <LocalGasStationIcon /> },
+  ];
+
+  const secondaryCategories = [
+    { value: 'museums', label: 'Museums', icon: <MuseumIcon /> },
+    { value: 'transit', label: 'Transit', icon: <DirectionsTransitIcon /> },
     { value: 'bars', label: 'Bars', icon: <LocalBarIcon /> },
     { value: 'coffee', label: 'Coffee', icon: <LocalCafeIcon /> },
     { value: 'groceries', label: 'Groceries', icon: <ShoppingCartIcon /> },
-    { value: 'gas stations', label: 'Gas', icon: <LocalGasStationIcon /> },
     { value: 'parking lots', label: 'Parking', icon: <LocalParkingIcon /> },
     { value: 'banks', label: 'Banks', icon: <AccountBalanceIcon /> },
     { value: 'hospitals', label: 'Hospitals', icon: <LocalHospitalIcon /> },
     { value: 'post offices', label: 'Post Offices', icon: <LocalPostOfficeIcon /> },
   ];
+
+  const isMoreActive = secondaryCategories.some((cat) => cat.value === type);
 
   return (
     <div className={classes.chipsContainer}>
@@ -56,16 +71,40 @@ const CategoryChips = ({ type, setType, rating, setRating }) => {
         <MenuItem onClick={() => { setRating('4.5'); setRatingAnchorEl(null); }}>Above 4.5</MenuItem>
       </Menu>
 
-      {categories.map((cat) => (
+      {primaryCategories.map((cat) => (
         <Chip
           key={cat.value}
           icon={cat.icon}
           label={cat.label}
           onClick={() => setType(cat.value)}
           className={`${classes.chip} ${type === cat.value ? classes.chipActive : ''}`}
-          color={type === cat.value ? 'primary' : 'default'}
         />
       ))}
+
+      <Chip
+        icon={<ExpandMoreIcon />}
+        label="More"
+        onClick={(e) => setMoreAnchorEl(e.currentTarget)}
+        className={`${classes.chip} ${isMoreActive ? classes.chipActive : ''}`}
+      />
+
+      <Menu
+        anchorEl={moreAnchorEl}
+        keepMounted
+        open={Boolean(moreAnchorEl)}
+        onClose={() => setMoreAnchorEl(null)}
+      >
+        {secondaryCategories.map((cat) => (
+          <MenuItem
+            key={cat.value}
+            onClick={() => { setType(cat.value); setMoreAnchorEl(null); }}
+            selected={type === cat.value}
+          >
+            {cat.icon}
+            <span style={{ marginLeft: '10px' }}>{cat.label}</span>
+          </MenuItem>
+        ))}
+      </Menu>
     </div>
   );
 };
