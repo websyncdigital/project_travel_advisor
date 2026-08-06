@@ -36,27 +36,39 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
         </div>
       ) : (
         <>
-          <div className={classes.iconsContainer}>
-            <div className={`${classes.iconItem} ${type === 'restaurants' ? classes.activeIcon : ''}`} onClick={() => setType('restaurants')}>
-              <div className={`${classes.iconCircle} ${classes.bgRestaurant}`}><RestaurantIcon /></div>
-              <span className={classes.iconLabel}>Restaurants</span>
+          <div className={classes.topSection}>
+            <div className={classes.iconsContainer}>
+              <div className={`${classes.iconItem} ${type === 'restaurants' ? classes.activeIcon : ''}`} onClick={() => setType('restaurants')}>
+                <div className={`${classes.iconCircle} ${classes.bgRestaurant}`}><RestaurantIcon /></div>
+                <span className={classes.iconLabel}>Restaurants</span>
+              </div>
+              <div className={`${classes.iconItem} ${type === 'hotels' ? classes.activeIcon : ''}`} onClick={() => setType('hotels')}>
+                <div className={`${classes.iconCircle} ${classes.bgHotel}`}><HotelIcon /></div>
+                <span className={classes.iconLabel}>Hotels</span>
+              </div>
+              <div className={`${classes.iconItem} ${type === 'attractions' ? classes.activeIcon : ''}`} onClick={() => setType('attractions')}>
+                <div className={`${classes.iconCircle} ${classes.bgDefault}`}><ExploreIcon /></div>
+                <span className={classes.iconLabel}>Attractions</span>
+              </div>
+              <div className={`${classes.iconItem} ${type === 'bars' ? classes.activeIcon : ''}`} onClick={() => setType('bars')}>
+                <div className={`${classes.iconCircle} ${classes.bgBar}`}><LocalBarIcon /></div>
+                <span className={classes.iconLabel}>Bars</span>
+              </div>
+              <div className={classes.iconItem} onClick={() => setIsExpanded(!isExpanded)}>
+                <div className={`${classes.iconCircle} ${classes.bgDefault}`}>{isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}</div>
+                <span className={classes.iconLabel}>{isExpanded ? 'Less' : 'More'}</span>
+              </div>
             </div>
-            <div className={`${classes.iconItem} ${type === 'hotels' ? classes.activeIcon : ''}`} onClick={() => setType('hotels')}>
-              <div className={`${classes.iconCircle} ${classes.bgHotel}`}><HotelIcon /></div>
-              <span className={classes.iconLabel}>Hotels</span>
-            </div>
-            <div className={`${classes.iconItem} ${type === 'bars' ? classes.activeIcon : ''}`} onClick={() => setType('bars')}>
-              <div className={`${classes.iconCircle} ${classes.bgBar}`}><LocalBarIcon /></div>
-              <span className={classes.iconLabel}>Bars</span>
-            </div>
-            <div className={`${classes.iconItem} ${type === 'coffee' ? classes.activeIcon : ''}`} onClick={() => setType('coffee')}>
-              <div className={`${classes.iconCircle} ${classes.bgCoffee}`}><LocalCafeIcon /></div>
-              <span className={classes.iconLabel}>Coffee</span>
-            </div>
-            <div className={classes.iconItem} onClick={() => setIsExpanded(!isExpanded)}>
-              <div className={`${classes.iconCircle} ${classes.bgDefault}`}>{isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}</div>
-              <span className={classes.iconLabel}>{isExpanded ? 'Less' : 'More'}</span>
-            </div>
+
+            <FormControl className={classes.formControl}>
+              <InputLabel id="rating">Rating</InputLabel>
+              <Select id="rating" value={rating} onChange={(e) => setRating(e.target.value)}>
+                <MenuItem value="">All</MenuItem>
+                <MenuItem value="3">Above 3.0</MenuItem>
+                <MenuItem value="4">Above 4.0</MenuItem>
+                <MenuItem value="4.5">Above 4.5</MenuItem>
+              </Select>
+            </FormControl>
           </div>
 
           {isExpanded && (
@@ -85,21 +97,13 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
                 <div className={`${classes.iconCircleGrid} ${classes.bgDefault}`}><LocalHospitalIcon /></div>
                 <span className={classes.iconLabelGrid}>Hospitals</span>
               </div>
-              <div className={`${classes.iconItemGrid} ${type === 'attractions' ? classes.activeIcon : ''}`} onClick={() => setType('attractions')}>
-                <div className={`${classes.iconCircleGrid} ${classes.bgDefault}`}><ExploreIcon /></div>
-                <span className={classes.iconLabelGrid}>Attractions</span>
+              <div className={`${classes.iconItemGrid} ${type === 'coffee' ? classes.activeIcon : ''}`} onClick={() => setType('coffee')}>
+                <div className={`${classes.iconCircleGrid} ${classes.bgCoffee}`}><LocalCafeIcon /></div>
+                <span className={classes.iconLabelGrid}>Coffee</span>
               </div>
             </div>
           )}
-          <FormControl className={classes.formControl}>
-            <InputLabel id="rating">Rating</InputLabel>
-            <Select id="rating" value={rating} onChange={(e) => setRating(e.target.value)}>
-              <MenuItem value="">All</MenuItem>
-              <MenuItem value="3">Above 3.0</MenuItem>
-              <MenuItem value="4">Above 4.0</MenuItem>
-              <MenuItem value="4.5">Above 4.5</MenuItem>
-            </Select>
-          </FormControl>
+
           <Grid container spacing={3} className={classes.list}>
             {places?.map((place, i) => (
               <Grid ref={elRefs[i]} key={i} item xs={12}>
