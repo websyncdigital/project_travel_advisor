@@ -1,8 +1,12 @@
 import React from 'react';
 import GoogleMapReact from 'google-map-react';
-import { Paper, Typography, useMediaQuery } from '@material-ui/core';
+import { Paper, Typography, useMediaQuery, IconButton, Divider } from '@material-ui/core';
 import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
 import Rating from '@material-ui/lab/Rating';
+import MyLocationIcon from '@material-ui/icons/MyLocation';
+import AddIcon from '@material-ui/icons/Add';
+import RemoveIcon from '@material-ui/icons/Remove';
+import LayersIcon from '@material-ui/icons/Layers';
 
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
@@ -15,6 +19,19 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const [internalMap, setInternalMap] = React.useState(null);
   const [routeError, setRouteError] = React.useState('');
   const [routeInfo, setRouteInfo] = React.useState(null);
+
+  const handleMyLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        ({ coords: { latitude, longitude } }) => {
+          setCoords({ lat: latitude, lng: longitude });
+        },
+        // eslint-disable-next-line no-console
+        (error) => console.error(error),
+        { enableHighAccuracy: true },
+      );
+    }
+  };
 
   const errorBannerStyle = {
     position: 'absolute',
@@ -131,7 +148,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
         center={coords}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
-        options={{ disableDefaultUI: true, zoomControl: true, styles: mapStyles, maxZoom: selectedDestination ? 15 : undefined }}
+        options={{ disableDefaultUI: true, zoomControl: false, styles: mapStyles, maxZoom: selectedDestination ? 15 : undefined }}
         onChange={(e) => {
           setCoords({ lat: e.center.lat, lng: e.center.lng });
           setBounds({ ne: e.marginBounds.ne, sw: e.marginBounds.sw });
@@ -209,6 +226,31 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           </Paper>
         </div>
       )}
+
+      {/* Floating Map Controls */}
+      <div className={classes.controlsContainer}>
+        <Paper className={classes.controlPaper}>
+          <IconButton className={classes.controlButton} onClick={() => {}} title="Layers">
+            <LayersIcon />
+          </IconButton>
+        </Paper>
+
+        <Paper className={classes.controlPaper}>
+          <IconButton className={classes.controlButton} onClick={handleMyLocation} title="My Location">
+            <MyLocationIcon />
+          </IconButton>
+        </Paper>
+
+        <Paper className={classes.controlPaper}>
+          <IconButton className={classes.controlButton} onClick={() => internalMap?.setZoom(internalMap.getZoom() + 1)} title="Zoom In">
+            <AddIcon />
+          </IconButton>
+          <Divider />
+          <IconButton className={classes.controlButton} onClick={() => internalMap?.setZoom(internalMap.getZoom() - 1)} title="Zoom Out">
+            <RemoveIcon />
+          </IconButton>
+        </Paper>
+      </div>
     </div>
   );
 };
