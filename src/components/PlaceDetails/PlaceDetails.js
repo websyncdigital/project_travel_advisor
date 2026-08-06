@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, Card, CardMedia, CardContent, CardActions, Chip } from '@material-ui/core';
+import { Box, Typography, Button, Card, CardMedia, CardContent, CardActions } from '@material-ui/core';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import PhoneIcon from '@material-ui/icons/Phone';
 import Rating from '@material-ui/lab/Rating';
@@ -29,13 +29,13 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
       <CardContent>
         <Typography gutterBottom variant="h5">{place.name}</Typography>
         <Box display="flex" justifyContent="space-between" my={2}>
-          <Rating name="read-only" value={Number(place.rating)} readOnly />
+          <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
           <Typography component="legend">{place.num_reviews} review{place.num_reviews > 1 && 's'}</Typography>
         </Box>
 
         {place.price_level !== undefined && (
           <Box display="flex" justifyContent="space-between">
-            <Typography component="legend">Price Level</Typography>
+            <Typography component="legend">Price</Typography>
             <Typography gutterBottom variant="subtitle1">
               {'$'.repeat(place.price_level)}
             </Typography>
@@ -57,9 +57,7 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
             <Typography variant="subtitle2" color="textSecondary">{award.display_name}</Typography>
           </Box>
         ))}
-        {place?.types?.map((name) => (
-          <Chip key={name} size="small" label={name.replace('_', ' ')} className={classes.chip} />
-        ))}
+
         {place.vicinity && (
           <Typography gutterBottom variant="body2" color="textSecondary" className={classes.subtitle}>
             <LocationOnIcon />{place.vicinity}

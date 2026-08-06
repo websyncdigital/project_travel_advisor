@@ -12,5 +12,8 @@ export default makeStyles(() => ({
   },
   pointer: {
     cursor: 'pointer',
+    width: '100%',
+    height: '70px',
+    objectFit: 'cover',
   },
 }));
