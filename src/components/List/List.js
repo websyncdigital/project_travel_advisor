@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createRef } from 'react';
-import { CircularProgress, Grid, Typography, InputLabel, MenuItem, FormControl, Select } from '@material-ui/core';
+import { CircularProgress, Grid, Typography, Menu, MenuItem } from '@material-ui/core';
 
 import RestaurantIcon from '@material-ui/icons/Restaurant';
 import HotelIcon from '@material-ui/icons/Hotel';
@@ -14,13 +14,24 @@ import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import LocalPostOfficeIcon from '@material-ui/icons/LocalPostOffice';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
 import ExploreIcon from '@material-ui/icons/Explore';
-
+import ThumbUpIcon from '@material-ui/icons/ThumbUp';
+import StarIcon from '@material-ui/icons/Star';
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 import useStyles from './styles.js';
+
+const CustomRatingIcon = () => (
+  <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <ThumbUpIcon style={{ fontSize: '18px', marginTop: '8px' }} />
+    <StarIcon style={{ position: 'absolute', top: '-6px', left: '-4px', fontSize: '12px' }} />
+    <StarIcon style={{ position: 'absolute', top: '-10px', left: '5px', fontSize: '14px' }} />
+    <StarIcon style={{ position: 'absolute', top: '-6px', left: '16px', fontSize: '12px' }} />
+  </div>
+);
 
 const List = ({ places, type, setType, rating, setRating, childClicked, isLoading, setSelectedDestination, selectedDestination }) => {
   const [elRefs, setElRefs] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [ratingAnchorEl, setRatingAnchorEl] = useState(null);
   const classes = useStyles();
 
   useEffect(() => {
@@ -58,17 +69,23 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
                 <div className={`${classes.iconCircle} ${classes.bgDefault}`}>{isExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}</div>
                 <span className={classes.iconLabel}>{isExpanded ? 'Less' : 'More'}</span>
               </div>
+              <div className={`${classes.iconItem} ${rating ? classes.activeIcon : ''}`} onClick={(e) => setRatingAnchorEl(e.currentTarget)}>
+                <div className={`${classes.iconCircle} ${classes.bgRating}`}><CustomRatingIcon /></div>
+                <span className={classes.iconLabel}>Rating</span>
+              </div>
             </div>
 
-            <FormControl className={classes.formControl}>
-              <InputLabel id="rating">Rating</InputLabel>
-              <Select id="rating" value={rating} onChange={(e) => setRating(e.target.value)}>
-                <MenuItem value="">All</MenuItem>
-                <MenuItem value="3">Above 3.0</MenuItem>
-                <MenuItem value="4">Above 4.0</MenuItem>
-                <MenuItem value="4.5">Above 4.5</MenuItem>
-              </Select>
-            </FormControl>
+            <Menu
+              anchorEl={ratingAnchorEl}
+              keepMounted
+              open={Boolean(ratingAnchorEl)}
+              onClose={() => setRatingAnchorEl(null)}
+            >
+              <MenuItem onClick={() => { setRating(''); setRatingAnchorEl(null); }}>All Ratings</MenuItem>
+              <MenuItem onClick={() => { setRating('3'); setRatingAnchorEl(null); }}>Above 3.0</MenuItem>
+              <MenuItem onClick={() => { setRating('4'); setRatingAnchorEl(null); }}>Above 4.0</MenuItem>
+              <MenuItem onClick={() => { setRating('4.5'); setRatingAnchorEl(null); }}>Above 4.5</MenuItem>
+            </Menu>
           </div>
 
           {isExpanded && (

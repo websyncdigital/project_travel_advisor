@@ -19,18 +19,14 @@ export default makeStyles((theme) => ({
   list: {
     height: '75vh', overflow: 'auto',
   },
-  topSection: {
+  iconsContainer: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    width: '100%',
     marginBottom: '20px',
     marginTop: '20px',
     borderBottom: '1px solid #eee',
     paddingBottom: '20px',
-  },
-  iconsContainer: {
-    display: 'flex',
-    gap: '15px',
   },
   iconsGrid: {
     display: 'grid',
@@ -59,14 +55,14 @@ export default makeStyles((theme) => ({
     },
   },
   iconCircle: {
-    width: '60px',
-    height: '60px',
+    width: '45px',
+    height: '45px',
     borderRadius: '50%',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
     color: 'white',
-    marginBottom: '10px',
+    marginBottom: '8px',
   },
   iconCircleGrid: {
     width: '50px',
@@ -79,7 +75,7 @@ export default makeStyles((theme) => ({
     marginRight: '15px',
   },
   iconLabel: {
-    fontSize: '0.85rem',
+    fontSize: '0.75rem',
     fontWeight: 500,
     color: '#555',
   },
@@ -93,6 +89,7 @@ export default makeStyles((theme) => ({
   bgBar: { backgroundColor: '#C8322B' },
   bgCoffee: { backgroundColor: '#A45D17' },
   bgDefault: { backgroundColor: '#607987' },
+  bgRating: { backgroundColor: '#F57C00' },
   activeIcon: {
     opacity: 1,
     boxShadow: '0px 4px 8px rgba(0,0,0,0.2)',
