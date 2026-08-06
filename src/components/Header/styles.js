@@ -1,33 +1,44 @@
-import { alpha, makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 
 export default makeStyles((theme) => ({
+  floatingSearchBar: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: '4px 8px',
+    borderRadius: '24px',
+    width: '400px',
+    backgroundColor: 'white',
+    boxShadow: '0px 2px 4px rgba(0,0,0,0.2)',
+  },
   title: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block',
-    },
+    color: theme.palette.primary.main,
+    fontWeight: 'bold',
+    marginLeft: theme.spacing(1),
+    marginRight: theme.spacing(2),
   },
   search: {
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': { backgroundColor: alpha(theme.palette.common.white, 0.25) },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: { marginLeft: theme.spacing(3), width: 'auto' },
+    display: 'flex',
+    alignItems: 'center',
+    flex: 1,
   },
   searchIcon: {
-    padding: theme.spacing(0, 2), height: '100%', position: 'absolute', pointerEvents: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: theme.spacing(0, 1),
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: '#555',
   },
   inputRoot: {
-    color: 'inherit',
+    color: '#333',
+    width: '100%',
   },
   inputInput: {
-    padding: theme.spacing(1, 1, 1, 0), paddingLeft: `calc(1em + ${theme.spacing(4)}px)`, transition: theme.transitions.create('width'), width: '100%', [theme.breakpoints.up('md')]: { width: '20ch' },
+    padding: theme.spacing(1, 1, 1, 0),
+    width: '100%',
   },
-  toolbar: {
-    display: 'flex', justifyContent: 'space-between',
+  divider: {
+    height: 28,
+    margin: 4,
   },
 }));
 

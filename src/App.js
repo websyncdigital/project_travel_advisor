@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { CssBaseline, Grid } from '@material-ui/core';
+import { CssBaseline } from '@material-ui/core';
 
 import Header from './components/Header/Header';
 import List from './components/List/List';
@@ -170,9 +170,29 @@ const App = () => {
   return (
     <>
       <CssBaseline />
-      <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} />
-      <Grid container spacing={3} style={{ width: '100%' }}>
-        <Grid item xs={12} md={4}>
+
+      {/* Background Map Layer */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1 }}>
+        <Map
+          setChildClicked={setChildClicked}
+          setBounds={setBounds}
+          setCoords={setCoords}
+          coords={coords}
+          places={rating ? filteredPlaces : places}
+          setMap={setMap}
+          weatherData={weatherData}
+          airQuality={airQuality}
+          timeZoneId={timeZoneId}
+          locationName={locationName}
+          selectedDestination={selectedDestination}
+        />
+      </div>
+
+      {/* Floating UI Overlays */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 2, overflow: 'hidden' }}>
+
+        {/* Left Side List Panel */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '400px', height: '100vh', backgroundColor: 'white', pointerEvents: 'auto', boxShadow: '2px 0 5px rgba(0,0,0,0.2)', overflowY: 'auto' }}>
           <List
             isLoading={isLoading}
             childClicked={childClicked}
@@ -184,23 +204,15 @@ const App = () => {
             setSelectedDestination={setSelectedDestination}
             selectedDestination={selectedDestination}
           />
-        </Grid>
-        <Grid item xs={12} md={8} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <Map
-            setChildClicked={setChildClicked}
-            setBounds={setBounds}
-            setCoords={setCoords}
-            coords={coords}
-            places={rating ? filteredPlaces : places}
-            setMap={setMap}
-            weatherData={weatherData}
-            airQuality={airQuality}
-            timeZoneId={timeZoneId}
-            locationName={locationName}
-            selectedDestination={selectedDestination}
-          />
-        </Grid>
-      </Grid>
+        </div>
+
+        {/* Top Header Pill */}
+        <div style={{ position: 'absolute', top: '20px', left: '420px', pointerEvents: 'auto' }}>
+          <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} />
+        </div>
+
+      </div>
+
       <AIAssistant coords={coords} locationName={locationName} places={places} />
     </>
   );

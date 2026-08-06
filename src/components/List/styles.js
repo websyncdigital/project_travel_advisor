@@ -17,7 +17,7 @@ export default makeStyles((theme) => ({
     marginBottom: '30px',
   },
   list: {
-    height: '75vh', overflow: 'auto',
+    height: 'calc(100vh - 220px)', overflow: 'auto',
   },
   iconsContainer: {
     display: 'flex',
