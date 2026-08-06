@@ -6,12 +6,12 @@ import SearchIcon from '@material-ui/icons/Search';
 
 import useStyles from './styles.js';
 
-const Header = ({ onPlaceChanged, onLoad }) => {
+const Header = ({ onPlaceChanged, onLoad, toggleDrawer }) => {
   const classes = useStyles();
 
   return (
     <Paper component="form" className={classes.floatingSearchBar}>
-      <IconButton aria-label="menu">
+      <IconButton aria-label="menu" onClick={toggleDrawer}>
         <MenuIcon />
       </IconButton>
 

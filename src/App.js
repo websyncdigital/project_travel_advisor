@@ -5,6 +5,7 @@ import Header from './components/Header/Header';
 import List from './components/List/List';
 import Map from './components/Map/Map';
 import AIAssistant from './components/AIAssistant/AIAssistant';
+import CategoryChips from './components/CategoryChips/CategoryChips';
 
 const App = () => {
   const [type, setType] = useState('restaurants');
@@ -25,6 +26,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
   const [selectedDestination, setSelectedDestination] = useState(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(({ coords: { latitude, longitude } }) => {
@@ -192,7 +194,21 @@ const App = () => {
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 2, overflow: 'hidden' }}>
 
         {/* Left Side List Panel */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '400px', height: '100vh', backgroundColor: 'white', pointerEvents: 'auto', boxShadow: '2px 0 5px rgba(0,0,0,0.2)', overflowY: 'auto' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '400px',
+            height: '100vh',
+            backgroundColor: 'white',
+            pointerEvents: 'auto',
+            boxShadow: '2px 0 5px rgba(0,0,0,0.2)',
+            overflowY: 'auto',
+            transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
+            transition: 'transform 0.3s ease-in-out',
+          }}
+        >
           <List
             isLoading={isLoading}
             childClicked={childClicked}
@@ -206,9 +222,10 @@ const App = () => {
           />
         </div>
 
-        {/* Top Header Pill */}
-        <div style={{ position: 'absolute', top: '20px', left: '420px', pointerEvents: 'auto' }}>
-          <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} />
+        {/* Floating Top Overlays (Search & Chips) */}
+        <div style={{ position: 'absolute', top: '20px', left: isDrawerOpen ? '420px' : '20px', pointerEvents: 'auto', transition: 'left 0.3s ease-in-out', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)} />
+          <CategoryChips type={type} setType={setType} rating={rating} setRating={setRating} />
         </div>
 
       </div>
