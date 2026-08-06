@@ -13,6 +13,7 @@ import LocalParkingIcon from '@material-ui/icons/LocalParking';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import LocalPostOfficeIcon from '@material-ui/icons/LocalPostOffice';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
+import ExploreIcon from '@material-ui/icons/Explore';
 
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 import useStyles from './styles.js';
@@ -83,6 +84,10 @@ const List = ({ places, type, setType, rating, setRating, childClicked, isLoadin
               <div className={`${classes.iconItemGrid} ${type === 'hospitals' ? classes.activeIcon : ''}`} onClick={() => setType('hospitals')}>
                 <div className={`${classes.iconCircleGrid} ${classes.bgDefault}`}><LocalHospitalIcon /></div>
                 <span className={classes.iconLabelGrid}>Hospitals</span>
+              </div>
+              <div className={`${classes.iconItemGrid} ${type === 'attractions' ? classes.activeIcon : ''}`} onClick={() => setType('attractions')}>
+                <div className={`${classes.iconCircleGrid} ${classes.bgDefault}`}><ExploreIcon /></div>
+                <span className={classes.iconLabelGrid}>Attractions</span>
               </div>
             </div>
           )}
