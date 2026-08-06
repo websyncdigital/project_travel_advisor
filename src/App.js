@@ -117,9 +117,18 @@ const App = () => {
 
       const service = new window.google.maps.places.PlacesService(map);
 
-      let mappedType = 'restaurant';
-      if (type === 'hotels') mappedType = 'lodging';
-      if (type === 'attractions') mappedType = 'tourist_attraction';
+      let mappedType = type;
+      if (type === 'restaurants') mappedType = 'restaurant';
+      else if (type === 'hotels') mappedType = 'lodging';
+      else if (type === 'attractions') mappedType = 'tourist_attraction';
+      else if (type === 'bars') mappedType = 'bar';
+      else if (type === 'coffee') mappedType = 'cafe';
+      else if (type === 'banks') mappedType = 'bank';
+      else if (type === 'gas stations') mappedType = 'gas_station';
+      else if (type === 'parking lots') mappedType = 'parking';
+      else if (type === 'groceries') mappedType = 'supermarket';
+      else if (type === 'post offices') mappedType = 'post_office';
+      else if (type === 'hospitals') mappedType = 'hospital';
 
       const request = {
         bounds: new window.google.maps.LatLngBounds(
