@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, DynamicRetrievalMode } from '@google/generative-ai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
@@ -32,12 +32,7 @@ const getGroundedModel = (context) => {
     model: 'gemini-3.6-flash',
     tools: [
       {
-        googleSearchRetrieval: {
-          dynamicRetrievalConfig: {
-            mode: DynamicRetrievalMode.MODE_DYNAMIC,
-            dynamicThreshold: 0.3,
-          },
-        },
+        googleSearch: {},
       },
     ],
     systemInstruction: instruction,
