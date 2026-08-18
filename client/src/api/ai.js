@@ -51,3 +51,32 @@ export const startTravelChat = (context) => {
     ],
   });
 };
+
+export const getSilentRecommendations = async (context) => {
+  if (!genAI) return [];
+  const model = genAI.getGenerativeModel({
+    model: 'gemini-3.6-flash',
+    generationConfig: {
+      responseMimeType: 'application/json',
+    },
+    systemInstruction: 'You are a travel assistant. Given the destination and current weather, '
+      + 'return exactly 3 personalized travel recommendations (e.g. food, sightseeing) as a JSON array. '
+      + "Each object must have a 'title' (string) and 'description' (string).",
+  });
+
+  const { locationName, weatherData, places } = context;
+  const prompt = `Destination: ${locationName || 'Unknown'}
+  Weather: ${weatherData?.currentConditions?.condition || 'Unknown'}, ${Math.round(weatherData?.currentConditions?.temperatureC || 0)}°C
+  Nearby Places: ${places && places.length > 0 ? places.slice(0, 5).map((p) => p.name).join(', ') : 'None provided'}
+  
+  Provide 3 curated recommendations based on this context. Return ONLY a JSON array of objects with 'title' and 'description'.`;
+
+  try {
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    return JSON.parse(text);
+  } catch (error) {
+    console.error('Silent AI Error:', error);
+    return [];
+  }
+};

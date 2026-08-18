@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, Paper } from '@material-ui/core';
+import { ThemeProvider } from '@material-ui/core/styles';
 
 import Header from './components/Header/Header';
-import List from './components/List/List';
+import Dashboard from './components/Dashboard/Dashboard';
 import Map from './components/Map/Map';
-import AIAssistant from './components/AIAssistant/AIAssistant';
 import CategoryChips from './components/CategoryChips/CategoryChips';
+import theme from './theme';
+import { getSilentRecommendations } from './api/ai';
 
 const App = () => {
   const [type, setType] = useState('restaurants');
@@ -22,10 +24,9 @@ const App = () => {
   const [locationName, setLocationName] = useState('');
 
   const [autocomplete, setAutocomplete] = useState(null);
-  const [childClicked, setChildClicked] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
-  const [selectedDestination, setSelectedDestination] = useState(null);
+  const [selectedDestination] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
@@ -158,6 +159,16 @@ const App = () => {
 
   const onLoad = (autoC) => setAutocomplete(autoC);
 
+  const [aiRecommendations, setAiRecommendations] = useState([]);
+
+  useEffect(() => {
+    if (places && places.length > 0 && weatherData) {
+      getSilentRecommendations({ coords, locationName, weatherData, places }).then((recs) => {
+        setAiRecommendations(recs);
+      });
+    }
+  }, [places, weatherData, locationName]);
+
   const onPlaceChanged = () => {
     if (autocomplete !== null) {
       const place = autocomplete.getPlace();
@@ -170,13 +181,12 @@ const App = () => {
   };
 
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <CssBaseline />
 
       {/* Background Map Layer */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1 }}>
         <Map
-          setChildClicked={setChildClicked}
           setBounds={setBounds}
           setCoords={setCoords}
           coords={coords}
@@ -193,7 +203,7 @@ const App = () => {
       {/* Floating UI Overlays */}
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 2, overflow: 'hidden' }}>
 
-        {/* Left Side List Panel */}
+        {/* Left Side Dashboard Panel */}
         <div
           style={{
             position: 'absolute',
@@ -201,25 +211,22 @@ const App = () => {
             left: 0,
             width: '400px',
             height: '100vh',
-            backgroundColor: 'white',
             pointerEvents: 'auto',
-            boxShadow: '2px 0 5px rgba(0,0,0,0.2)',
-            overflowY: 'auto',
+            overflowY: 'hidden',
             transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
             transition: 'transform 0.3s ease-in-out',
+            zIndex: 10,
           }}
         >
-          <List
-            isLoading={isLoading}
-            childClicked={childClicked}
-            places={rating ? filteredPlaces : places}
-            type={type}
-            setType={setType}
-            rating={rating}
-            setRating={setRating}
-            setSelectedDestination={setSelectedDestination}
-            selectedDestination={selectedDestination}
-          />
+          <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
+            <Dashboard
+              isLoading={isLoading}
+              startingLocationName="Current Location"
+              destinationName={locationName}
+              weatherData={weatherData}
+              aiRecommendations={aiRecommendations}
+            />
+          </Paper>
         </div>
 
         {/* Floating Top Overlays (Search & Chips) */}
@@ -229,9 +236,7 @@ const App = () => {
         </div>
 
       </div>
-
-      <AIAssistant coords={coords} locationName={locationName} places={places} />
-    </>
+    </ThemeProvider>
   );
 };
 
