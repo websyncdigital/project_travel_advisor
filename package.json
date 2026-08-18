@@ -8,7 +8,7 @@
     "server": "nodemon server/index.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm --prefix client install && npm --prefix client run build && rm -rf public && cp -R client/build public"
+    "build": "npm --prefix client install --include=dev && CI=false npm --prefix client run build && rm -rf public && cp -R client/build public"
   },
   "repository": {
     "type": "git",
