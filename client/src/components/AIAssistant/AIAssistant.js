@@ -124,13 +124,13 @@ const AIAssistant = ({ coords, locationName, places }) => {
     
     // Create a visual message block for the user
     setMessages((prev) => [
-      ...prev, 
-      { role: 'user', text: userMessage, image: selectedImage }
+      ...prev,
+      { role: 'user', text: userMessage, image: selectedImage },
     ]);
-    
+
     const currentImage = selectedImage;
     const currentFile = imageFile;
-    
+
     removeImage();
     setIsLoading(true);
 
@@ -138,11 +138,13 @@ const AIAssistant = ({ coords, locationName, places }) => {
       let responseText = '';
       if (currentImage && currentFile) {
         // Prepare history context for ungrounded visual model
-        const historyContext = messages.map(m => `${m.role === 'user' ? 'User' : 'Agent'}: ${m.text}`).join('\n');
+        const historyContext = messages.map((m) => `${m.role === 'user' ? 'User' : 'Agent'}: ${m.text}`).join('\n');
         responseText = await sendMultimodalMessage(userMessage || 'What is in this image?', currentImage, currentFile.type, historyContext);
-        
+
         // Push the manual response into the active chatSession history seamlessly
+        // eslint-disable-next-line no-underscore-dangle
         chatSession._history.push({ role: 'user', parts: [{ text: userMessage || 'What is in this image?' }] });
+        // eslint-disable-next-line no-underscore-dangle
         chatSession._history.push({ role: 'model', parts: [{ text: responseText }] });
       } else {
         const result = await chatSession.sendMessage(userMessage);
@@ -237,15 +239,15 @@ const AIAssistant = ({ coords, locationName, places }) => {
                 </IconButton>
               </div>
             )}
-            <input
-              type="file"
-              accept="image/*"
-              capture="environment"
-              id="icon-button-file"
-              style={{ display: 'none' }}
-              onChange={handleImageChange}
-            />
             <label htmlFor="icon-button-file">
+              <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                id="icon-button-file"
+                style={{ display: 'none' }}
+                onChange={handleImageChange}
+              />
               <IconButton color="primary" component="span" disabled={isLoading || !chatSession}>
                 <CameraAlt fontSize="small" />
               </IconButton>

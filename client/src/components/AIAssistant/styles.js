@@ -119,7 +119,6 @@ export default makeStyles((theme) => ({
     bottom: '100%',
     left: theme.spacing(2),
     marginBottom: theme.spacing(1),
-    position: 'relative',
     display: 'inline-block',
   },
   imagePreview: {
