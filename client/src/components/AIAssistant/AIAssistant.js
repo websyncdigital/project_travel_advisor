@@ -121,7 +121,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
 
     const userMessage = input.trim();
     setInput('');
-    
+
     // Create a visual message block for the user
     setMessages((prev) => [
       ...prev,
