@@ -72,18 +72,18 @@ export default makeStyles((theme) => ({
   inputArea: {
     display: 'flex',
     padding: theme.spacing(1.5, 2),
-    backgroundColor: 'white',
-    borderTop: '1px solid #eee',
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    borderTop: '1px solid rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
   },
   inputBase: {
     flex: 1,
     marginRight: theme.spacing(1),
     padding: theme.spacing(1, 2),
-    backgroundColor: '#f0f2f5',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     borderRadius: 24,
     fontSize: '0.95rem',
-    color: '#333',
+    color: '#fff',
   },
   sendButton: {
     color: '#2196F3',
