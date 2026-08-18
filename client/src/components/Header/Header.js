@@ -12,10 +12,10 @@ const Header = ({ onPlaceChanged, onLoad, toggleDrawer }) => {
   return (
     <Paper component="form" className={classes.floatingSearchBar}>
       <IconButton aria-label="menu" onClick={toggleDrawer}>
-        <MenuIcon />
+        <MenuIcon style={{ color: '#555' }} />
       </IconButton>
 
-      <Typography variant="h6" className={classes.title}>
+      <Typography variant="h6" className={classes.title} style={{ whiteSpace: 'nowrap' }}>
         Travel Advisor
       </Typography>
 
