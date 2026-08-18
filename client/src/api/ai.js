@@ -26,7 +26,7 @@ const getGroundedModel = (context) => {
   }
 
   return genAI.getGenerativeModel({
-    model: 'gemini-3.6-flash',
+    model: 'gemini-1.5-flash',
     tools: [
       {
         googleSearch: {},
@@ -55,7 +55,7 @@ export const startTravelChat = (context) => {
 export const getSilentRecommendations = async (context) => {
   if (!genAI) return [];
   const model = genAI.getGenerativeModel({
-    model: 'gemini-3.6-flash',
+    model: 'gemini-1.5-flash',
     generationConfig: {
       responseMimeType: 'application/json',
     },

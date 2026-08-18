@@ -83,6 +83,7 @@ export default makeStyles((theme) => ({
     backgroundColor: '#f0f2f5',
     borderRadius: 24,
     fontSize: '0.95rem',
+    color: '#333',
   },
   sendButton: {
     color: '#2196F3',
