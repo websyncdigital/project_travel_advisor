@@ -131,7 +131,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error sending message:', error);
-      setMessages((prev) => [...prev, { role: 'model', text: 'Sorry, I encountered an error while trying to fetch that information for you. Please try again.' }]);
+      setMessages((prev) => [...prev, { role: 'model', text: `Error details: ${error.message || 'Unknown error'}. Please take a screenshot of this.` }]);
     } finally {
       setIsLoading(false);
     }
