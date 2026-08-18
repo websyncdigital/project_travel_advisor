@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Paper, Typography, InputBase, IconButton, Fab } from '@material-ui/core';
-import { Send, Chat as MessageCircle, Close as X } from '@material-ui/icons';
+import { Send, Chat as MessageCircle, Close as X, Mic, MicOff } from '@material-ui/icons';
 import { startTravelChat } from '../../api/ai';
 import useStyles from './styles';
 
@@ -13,7 +13,51 @@ const AIAssistant = ({ coords, locationName, places }) => {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [chatSession, setChatSession] = useState(null);
+  const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
+  const recognitionRef = useRef(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+      recognitionRef.current.lang = 'en-US';
+
+      recognitionRef.current.onresult = (event) => {
+        const { transcript } = event.results[0][0];
+        setInput(transcript);
+        // Automatically send after voice input
+        setTimeout(() => document.getElementById('chat-send-btn')?.click(), 500);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    } else {
+      recognitionRef.current?.start();
+      setIsListening(true);
+    }
+  };
+
+  const speak = (text) => {
+    if ('speechSynthesis' in window) {
+      // Remove markdown before speaking
+      const cleanText = text.replace(/[*#]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 1.1;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -50,6 +94,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
       const responseText = result.response.text();
 
       setMessages((prev) => [...prev, { role: 'model', text: responseText }]);
+      speak(responseText);
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error sending message:', error);
@@ -116,6 +161,14 @@ const AIAssistant = ({ coords, locationName, places }) => {
               disabled={isLoading || !chatSession}
             />
             <IconButton
+              onClick={toggleListening}
+              color={isListening ? 'secondary' : 'default'}
+              disabled={isLoading || !chatSession || !recognitionRef.current}
+            >
+              {isListening ? <MicOff fontSize="small" /> : <Mic fontSize="small" />}
+            </IconButton>
+            <IconButton
+              id="chat-send-btn"
               type="submit"
               className={classes.sendButton}
               disabled={!input.trim() || isLoading || !chatSession}

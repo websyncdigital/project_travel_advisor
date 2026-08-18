@@ -6,6 +6,7 @@ import Header from './components/Header/Header';
 import Dashboard from './components/Dashboard/Dashboard';
 import Map from './components/Map/Map';
 import CategoryChips from './components/CategoryChips/CategoryChips';
+import AIAssistant from './components/AIAssistant/AIAssistant';
 import theme from './theme';
 import { getSilentRecommendations } from './api/ai';
 
@@ -236,6 +237,8 @@ const App = () => {
         </div>
 
       </div>
+
+      <AIAssistant coords={coords} locationName={locationName} places={places} />
     </ThemeProvider>
   );
 };

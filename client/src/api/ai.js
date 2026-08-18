@@ -7,10 +7,10 @@ const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 const getGroundedModel = (context) => {
   if (!genAI) throw new Error('Missing Gemini API Key in .env file.');
 
-  let instruction = 'You are an expert travel advisor AI built directly into the Travel Advisor application. '
+  let instruction = 'You are an expert AI Travel Support Chat and Voice Agent built into the Travel Advisor application. '
     + 'You MUST provide highly specific, location-aware answers based on the user\'s current state in the app. '
-    + 'Use your Google Grounding tools to find the best routes, restaurants, hotels, and attractions. '
-    + 'Keep your answers concise, formatted in markdown, and highly enthusiastic! ';
+    + 'Keep your responses concise, highly conversational, and avoid overly dense formatting when replying. '
+    + 'Speak to the user as a friendly human travel guide would! ';
 
   if (context) {
     const { coords, locationName, places } = context;
