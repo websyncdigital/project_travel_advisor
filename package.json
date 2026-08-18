@@ -8,7 +8,7 @@
     "server": "nodemon server/index.js",
     "client": "npm start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "npm --prefix client install --include=dev && cd client && CI=false NODE_OPTIONS=--openssl-legacy-provider node node_modules/react-scripts/bin/react-scripts.js build && cd .. && rm -rf public && cp -R client/build public"
+    "build": "npm --prefix client install --include=dev && cd client && CI=false NODE_OPTIONS=--openssl-legacy-provider node node_modules/react-scripts/bin/react-scripts.js build && cd .. && rm -rf build && cp -R client/build build"
   },
   "repository": {
     "type": "git",
