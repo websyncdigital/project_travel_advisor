@@ -85,7 +85,7 @@ const Dashboard = ({ isLoading, startingLocationName, destinationName, weatherDa
           <ExploreIcon color="secondary" /> AI Recommendations
         </Typography>
         <Divider style={{ marginBottom: '16px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
-        
+
         {aiRecommendations && aiRecommendations.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {aiRecommendations.map((rec, i) => (

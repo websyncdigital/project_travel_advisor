@@ -1,4 +1,5 @@
 require('dotenv').config();
+
 const apiKey = process.env.REACT_APP_GEMINI_API_KEY;
 
 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
@@ -9,9 +10,9 @@ fetch(url, {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    contents: [{ parts: [{ text: "Hello" }] }]
-  })
+    contents: [{ parts: [{ text: 'Hello' }] }],
+  }),
 })
-.then(res => res.json())
-.then(console.log)
-.catch(console.error);
+  .then((res) => res.json())
+  .then(console.log)
+  .catch(console.error);
