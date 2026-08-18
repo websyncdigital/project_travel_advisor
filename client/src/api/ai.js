@@ -83,3 +83,26 @@ export const getSilentRecommendations = async (context) => {
     return [];
   }
 };
+
+export const sendMultimodalMessage = async (text, base64Data, mimeType, historyContext) => {
+  if (!genAI) throw new Error('Missing Gemini API Key in .env file.');
+  
+  // Use standard model without grounding tools, as grounding is not supported with images
+  const visionModel = genAI.getGenerativeModel({ model: 'gemini-3.6-flash' });
+  
+  const promptParts = [
+    { text: `Conversation History:\n${historyContext}\n\nUser Request: ${text}` }
+  ];
+
+  if (base64Data) {
+    promptParts.push({
+      inlineData: {
+        data: base64Data.split(',')[1] || base64Data, // ensure pure base64 without data URL prefix
+        mimeType: mimeType || 'image/jpeg'
+      }
+    });
+  }
+
+  const result = await visionModel.generateContent(promptParts);
+  return result.response.text();
+};

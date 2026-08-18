@@ -114,4 +114,31 @@ export default makeStyles((theme) => ({
     '0%, 80%, 100%': { transform: 'scale(0)' },
     '40%': { transform: 'scale(1)' },
   },
+  imagePreviewContainer: {
+    position: 'absolute',
+    bottom: '100%',
+    left: theme.spacing(2),
+    marginBottom: theme.spacing(1),
+    position: 'relative',
+    display: 'inline-block',
+  },
+  imagePreview: {
+    height: 80,
+    width: 80,
+    objectFit: 'cover',
+    borderRadius: 8,
+    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+    border: '2px solid white',
+  },
+  removeImageButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#ff4d4d',
+    color: 'white',
+    padding: 4,
+    '&:hover': {
+      backgroundColor: '#ff3333',
+    },
+  },
 }));

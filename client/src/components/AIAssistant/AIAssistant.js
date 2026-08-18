@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Paper, Typography, InputBase, IconButton, Fab } from '@material-ui/core';
-import { Send, Chat as MessageCircle, Close as X, Mic, MicOff } from '@material-ui/icons';
-import { startTravelChat } from '../../api/ai';
+import { Send, Chat as MessageCircle, Close as X, Mic, MicOff, CameraAlt } from '@material-ui/icons';
+import { startTravelChat, sendMultimodalMessage } from '../../api/ai';
 import useStyles from './styles';
 
 const AIAssistant = ({ coords, locationName, places }) => {
@@ -11,6 +11,8 @@ const AIAssistant = ({ coords, locationName, places }) => {
     { role: 'model', text: 'Hello! I am your AI Travel Advisor. I am connected to Google\'s Grounding data, so I can find the best real-time spots for you anywhere in the world! Where are we exploring today?' },
   ]);
   const [input, setInput] = useState('');
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [chatSession, setChatSession] = useState(null);
   const [isListening, setIsListening] = useState(false);
@@ -96,18 +98,56 @@ const AIAssistant = ({ coords, locationName, places }) => {
     initChat();
   }, [isOpen, chatSession, coords, locationName, places]);
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSelectedImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setImageFile(null);
+  };
+
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || !chatSession) return;
+    if ((!input.trim() && !selectedImage) || !chatSession) return;
 
     const userMessage = input.trim();
     setInput('');
-    setMessages((prev) => [...prev, { role: 'user', text: userMessage }]);
+    
+    // Create a visual message block for the user
+    setMessages((prev) => [
+      ...prev, 
+      { role: 'user', text: userMessage, image: selectedImage }
+    ]);
+    
+    const currentImage = selectedImage;
+    const currentFile = imageFile;
+    
+    removeImage();
     setIsLoading(true);
 
     try {
-      const result = await chatSession.sendMessage(userMessage);
-      const responseText = result.response.text();
+      let responseText = '';
+      if (currentImage && currentFile) {
+        // Prepare history context for ungrounded visual model
+        const historyContext = messages.map(m => `${m.role === 'user' ? 'User' : 'Agent'}: ${m.text}`).join('\n');
+        responseText = await sendMultimodalMessage(userMessage || 'What is in this image?', currentImage, currentFile.type, historyContext);
+        
+        // Push the manual response into the active chatSession history seamlessly
+        chatSession._history.push({ role: 'user', parts: [{ text: userMessage || 'What is in this image?' }] });
+        chatSession._history.push({ role: 'model', parts: [{ text: responseText }] });
+      } else {
+        const result = await chatSession.sendMessage(userMessage);
+        responseText = result.response.text();
+      }
 
       setMessages((prev) => [...prev, { role: 'model', text: responseText }]);
       speak(responseText);
@@ -171,6 +211,9 @@ const AIAssistant = ({ coords, locationName, places }) => {
                 key={idx}
                 className={`${classes.messageBubble} ${msg.role === 'user' ? classes.userMessage : classes.aiMessage}`}
               >
+                {msg.image && (
+                  <img src={msg.image} alt="User upload" style={{ width: '100%', borderRadius: 8, marginBottom: 8 }} />
+                )}
                 {formatText(msg.text)}
               </div>
             ))}
@@ -185,7 +228,28 @@ const AIAssistant = ({ coords, locationName, places }) => {
             <div ref={messagesEndRef} />
           </div>
 
-          <form className={classes.inputArea} onSubmit={handleSend}>
+          <form className={classes.inputArea} onSubmit={handleSend} style={{ position: 'relative' }}>
+            {selectedImage && (
+              <div className={classes.imagePreviewContainer} style={{ position: 'absolute', bottom: '100%', left: 16, marginBottom: 8 }}>
+                <img src={selectedImage} alt="Preview" className={classes.imagePreview} />
+                <IconButton size="small" className={classes.removeImageButton} onClick={removeImage}>
+                  <X fontSize="inherit" />
+                </IconButton>
+              </div>
+            )}
+            <input
+              type="file"
+              accept="image/*"
+              capture="environment"
+              id="icon-button-file"
+              style={{ display: 'none' }}
+              onChange={handleImageChange}
+            />
+            <label htmlFor="icon-button-file">
+              <IconButton color="primary" component="span" disabled={isLoading || !chatSession}>
+                <CameraAlt fontSize="small" />
+              </IconButton>
+            </label>
             <InputBase
               className={classes.inputBase}
               placeholder="Ask about places to visit..."
@@ -204,7 +268,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
               id="chat-send-btn"
               type="submit"
               className={classes.sendButton}
-              disabled={!input.trim() || isLoading || !chatSession}
+              disabled={(!input.trim() && !selectedImage) || isLoading || !chatSession}
             >
               <Send fontSize="small" />
             </IconButton>
