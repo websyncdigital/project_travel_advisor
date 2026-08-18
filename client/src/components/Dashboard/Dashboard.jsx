@@ -5,8 +5,9 @@ import LocationOnIcon from '@material-ui/icons/LocationOn';
 import DriveEtaIcon from '@material-ui/icons/DriveEta';
 import CloudIcon from '@material-ui/icons/Cloud';
 import ExploreIcon from '@material-ui/icons/Explore';
+import PlaceDetails from '../PlaceDetails/PlaceDetails';
 
-const Dashboard = ({ isLoading, startingLocationName, destinationName, weatherData, aiRecommendations }) => {
+const Dashboard = ({ isLoading, startingLocationName, destinationName, weatherData, aiRecommendations, selectedDestination, setSelectedDestination }) => {
   if (isLoading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -89,16 +90,12 @@ const Dashboard = ({ isLoading, startingLocationName, destinationName, weatherDa
         {aiRecommendations && aiRecommendations.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             {aiRecommendations.map((rec, i) => (
-              <Card key={i} elevation={0} style={{ backgroundColor: 'rgba(59, 130, 246, 0.1)' }}>
-                <CardContent>
-                  <Typography variant="subtitle1" style={{ fontWeight: 600, color: '#60a5fa' }}>
-                    {rec.title}
-                  </Typography>
-                  <Typography variant="body2" style={{ marginTop: '8px', color: '#cbd5e1' }}>
-                    {rec.description}
-                  </Typography>
-                </CardContent>
-              </Card>
+              <PlaceDetails
+                key={i}
+                place={rec}
+                selectedDestination={selectedDestination}
+                setSelectedDestination={setSelectedDestination}
+              />
             ))}
           </div>
         ) : (

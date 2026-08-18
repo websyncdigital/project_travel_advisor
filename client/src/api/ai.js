@@ -57,28 +57,43 @@ export const startTravelChat = (context) => {
 
 export const getSilentRecommendations = async (context) => {
   if (!genAI) return [];
+
+  const { locationName, weatherData, places } = context;
+
+  if (!places || places.length === 0) return [];
+
   const model = genAI.getGenerativeModel({
     model: 'gemini-3.6-flash',
     generationConfig: {
       responseMimeType: 'application/json',
     },
-    systemInstruction: 'You are a travel assistant. Given the destination and current weather, '
-      + 'return exactly 3 personalized travel recommendations (e.g. food, sightseeing) as a JSON array. '
-      + "Each object must have a 'title' (string) and 'description' (string).",
+    systemInstruction: 'You are a travel assistant. Given the context and a list of nearby places, '
+      + 'select the top 3 best matching places. '
+      + 'Return a JSON array of EXACT place names that you recommend.',
   });
 
-  const { locationName, weatherData, places } = context;
+  // Provide the first 15 places to choose from
+  const availablePlaces = places.slice(0, 15).map((p) => p.name).join(', ');
+
   const prompt = `Destination: ${locationName || 'Unknown'}
   Weather: ${weatherData?.currentConditions?.condition || 'Unknown'}, ${Math.round(weatherData?.currentConditions?.temperatureC || 0)}°C
-  Nearby Places: ${places && places.length > 0 ? places.slice(0, 5).map((p) => p.name).join(', ') : 'None provided'}
+  Available Places to Choose From: ${availablePlaces}
   
-  Provide 3 curated recommendations based on this context. Return ONLY a JSON array of objects with 'title' and 'description'.`;
+  Provide exactly 3 curated recommendations from the "Available Places" list based on the weather and destination. Return ONLY a JSON array of strings, where each string is the exact name of the place.`;
 
   try {
     const result = await model.generateContent(prompt);
     const text = result.response.text();
-    return JSON.parse(text);
+    const recommendedNames = JSON.parse(text);
+
+    // Map the returned names back to actual place objects
+    const recommendedPlaces = recommendedNames
+      .map((name) => places.find((p) => p.name === name))
+      .filter((p) => p !== undefined);
+
+    return recommendedPlaces;
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Silent AI Error:', error);
     return [];
   }

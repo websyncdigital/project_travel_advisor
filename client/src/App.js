@@ -27,7 +27,7 @@ const App = () => {
   const [autocomplete, setAutocomplete] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [map, setMap] = useState(null);
-  const [selectedDestination] = useState(null);
+  const [selectedDestination, setSelectedDestination] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
@@ -226,6 +226,8 @@ const App = () => {
               destinationName={locationName}
               weatherData={weatherData}
               aiRecommendations={aiRecommendations}
+              selectedDestination={selectedDestination}
+              setSelectedDestination={setSelectedDestination}
             />
           </Paper>
         </div>
