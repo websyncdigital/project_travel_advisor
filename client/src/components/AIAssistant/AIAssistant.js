@@ -116,19 +116,18 @@ const AIAssistant = ({ coords, locationName, places }) => {
       fetch('/api/scraper/memory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ log: `User: ${userMessage}\nAgent: ${responseText}` })
-      }).catch(err => console.warn('Failed to save memory', err));
-      
+        body: JSON.stringify({ log: `User: ${userMessage}\nAgent: ${responseText}` }),
+      }).catch((err) => console.warn('Failed to save memory', err));
+
       // Auto-scan URLs if user provides them
       const urlMatch = userMessage.match(/https?:\/\/[^\s]+/);
       if (urlMatch) {
         fetch('/api/scraper/scan', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: urlMatch[0] })
-        }).catch(err => console.warn('Failed to trigger scan', err));
+          body: JSON.stringify({ url: urlMatch[0] }),
+        }).catch((err) => console.warn('Failed to trigger scan', err));
       }
-      
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error sending message:', error);
