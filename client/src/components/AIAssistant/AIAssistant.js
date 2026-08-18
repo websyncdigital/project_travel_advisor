@@ -18,6 +18,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+  const hasSpeechSupport = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -248,7 +249,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
                 style={{ display: 'none' }}
                 onChange={handleImageChange}
               />
-              <IconButton color="primary" component="span" disabled={isLoading || !chatSession}>
+              <IconButton className={classes.actionButton} color="primary" component="span" disabled={isLoading || !chatSession}>
                 <CameraAlt fontSize="small" />
               </IconButton>
             </label>
@@ -260,9 +261,10 @@ const AIAssistant = ({ coords, locationName, places }) => {
               disabled={isLoading || !chatSession}
             />
             <IconButton
+              className={classes.actionButton}
               onClick={toggleListening}
               color={isListening ? 'secondary' : 'default'}
-              disabled={isLoading || !chatSession || !recognitionRef.current}
+              disabled={isLoading || !chatSession || !hasSpeechSupport}
             >
               {isListening ? <MicOff fontSize="small" /> : <Mic fontSize="small" />}
             </IconButton>

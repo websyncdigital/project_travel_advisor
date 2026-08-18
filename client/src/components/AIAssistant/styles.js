@@ -88,6 +88,10 @@ export default makeStyles((theme) => ({
   sendButton: {
     color: '#2196F3',
     padding: 8,
+    flexShrink: 0,
+  },
+  actionButton: {
+    flexShrink: 0,
   },
   loadingContainer: {
     alignSelf: 'flex-start',
