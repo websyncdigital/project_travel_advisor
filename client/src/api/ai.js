@@ -23,6 +23,9 @@ const getGroundedModel = (context) => {
       const placeNames = places.slice(0, 10).map((p) => p.name).join(', ');
       instruction += `\n\nThe user is currently looking at a map displaying these places: ${placeNames}.`;
     }
+    if (context.corpus) {
+      instruction += `\n\n### LOCAL KNOWLEDGE BASE (USE THIS DATA FIRST) ###\n${context.corpus}\n#################################################`;
+    }
   }
 
   return genAI.getGenerativeModel({

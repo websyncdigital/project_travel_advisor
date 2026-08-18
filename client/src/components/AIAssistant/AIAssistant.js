@@ -68,17 +68,33 @@ const AIAssistant = ({ coords, locationName, places }) => {
   }, [messages, isLoading]);
 
   useEffect(() => {
-    if (isOpen && !chatSession) {
-      try {
-        const session = startTravelChat({ coords, locationName, places });
-        setChatSession(session);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Failed to start chat session:', error);
-        setMessages((prev) => [...prev, { role: 'model', text: 'Sorry, I am currently unavailable. Please ensure your Gemini API key is configured correctly.' }]);
+    const initChat = async () => {
+      if (isOpen && !chatSession) {
+        try {
+          // 1. Fetch Local Knowledge Base (Corpus) from Python Backend
+          let corpus = '';
+          try {
+            const res = await fetch('/api/scraper/corpus');
+            if (res.ok) {
+              const data = await res.json();
+              corpus = data.corpus || '';
+            }
+          } catch (e) {
+            console.warn('Could not load corpus from python backend');
+          }
+
+          // 2. Start Chat with Grounding + Corpus
+          const session = startTravelChat({ coords, locationName, places, corpus });
+          setChatSession(session);
+        } catch (error) {
+          // eslint-disable-next-line no-console
+          console.error('Failed to start chat session:', error);
+          setMessages((prev) => [...prev, { role: 'model', text: 'Sorry, I am currently unavailable. Please ensure your Gemini API key is configured correctly.' }]);
+        }
       }
-    }
-  }, [isOpen, chatSession]);
+    };
+    initChat();
+  }, [isOpen, chatSession, coords, locationName, places]);
 
   const handleSend = async (e) => {
     e.preventDefault();
@@ -95,6 +111,24 @@ const AIAssistant = ({ coords, locationName, places }) => {
 
       setMessages((prev) => [...prev, { role: 'model', text: responseText }]);
       speak(responseText);
+
+      // Log Interaction to Memory
+      fetch('/api/scraper/memory', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ log: `User: ${userMessage}\nAgent: ${responseText}` })
+      }).catch(err => console.warn('Failed to save memory', err));
+      
+      // Auto-scan URLs if user provides them
+      const urlMatch = userMessage.match(/https?:\/\/[^\s]+/);
+      if (urlMatch) {
+        fetch('/api/scraper/scan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: urlMatch[0] })
+        }).catch(err => console.warn('Failed to trigger scan', err));
+      }
+      
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error sending message:', error);
