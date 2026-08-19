@@ -24,6 +24,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
   const [isListening, setIsListening] = useState(false);
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
+  const silenceTimeoutRef = useRef(null);
   const hasSpeechSupport = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
   // Initialize Speech Recognition
@@ -31,15 +32,22 @@ const AIAssistant = ({ coords, locationName, places }) => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognition) {
       recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
+      recognitionRef.current.continuous = true;
+      recognitionRef.current.interimResults = true;
       recognitionRef.current.lang = 'en-US';
 
       recognitionRef.current.onresult = (event) => {
-        const { transcript } = event.results[0][0];
-        setInput(transcript);
-        // Automatically send after voice input
-        setTimeout(() => document.getElementById('chat-send-btn')?.click(), 500);
+        let currentTranscript = '';
+        for (let i = 0; i < event.results.length; i += 1) {
+          currentTranscript += event.results[i][0].transcript;
+        }
+        setInput(currentTranscript);
+
+        if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+        silenceTimeoutRef.current = setTimeout(() => {
+          recognitionRef.current?.stop();
+          document.getElementById('chat-send-btn')?.click();
+        }, 3000);
       };
 
       recognitionRef.current.onend = () => {
@@ -50,9 +58,12 @@ const AIAssistant = ({ coords, locationName, places }) => {
 
   const toggleListening = () => {
     if (isListening) {
+      if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
       recognitionRef.current?.stop();
       setIsListening(false);
+      setTimeout(() => document.getElementById('chat-send-btn')?.click(), 300);
     } else {
+      setInput('');
       recognitionRef.current?.start();
       setIsListening(true);
     }
@@ -135,6 +146,12 @@ const AIAssistant = ({ coords, locationName, places }) => {
   const handleSend = async (e) => {
     e.preventDefault();
     if ((!input.trim() && !selectedImage) || !chatSession) return;
+
+    if (silenceTimeoutRef.current) clearTimeout(silenceTimeoutRef.current);
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+    }
 
     const userMessage = input.trim();
     setInput('');
