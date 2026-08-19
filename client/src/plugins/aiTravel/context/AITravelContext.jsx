@@ -17,15 +17,16 @@ export const AITravelProvider = ({ children }) => {
       const response = await fetch('http://localhost:5000/api/v1/ai-travel/search-along-route', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           routePolyline: routeGeoJson ? routeGeoJson.geometry : 'mock_polyline',
-          maxDetourMinutes: 10 
-        })
+          maxDetourMinutes: 10,
+        }),
       });
       const data = await response.json();
       if (data.landmarks) setLandmarks(data.landmarks);
       if (data.venues) setVenues(data.venues);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error fetching route landmarks:', error);
     }
   };
@@ -35,11 +36,12 @@ export const AITravelProvider = ({ children }) => {
       const response = await fetch('http://localhost:5000/api/v1/ai-travel/voice-copilot', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: command, activeRoute })
+        body: JSON.stringify({ query: command, activeRoute }),
       });
       const data = await response.json();
       setVoiceCopilotMessage(data.message);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error processing voice command:', error);
     }
   };
@@ -58,8 +60,9 @@ export const AITravelProvider = ({ children }) => {
       isSearchPanelOpen,
       setIsSearchPanelOpen,
       setRouteAndFetchLandmarks,
-      executeVoiceCommand
-    }}>
+      executeVoiceCommand,
+    }}
+    >
       {children}
     </AITravelContext.Provider>
   );

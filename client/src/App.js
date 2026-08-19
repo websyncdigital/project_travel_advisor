@@ -15,6 +15,7 @@ import { AITravelProvider } from './plugins/aiTravel/context/AITravelContext';
 import PreRideLandmarkDrawer from './plugins/aiTravel/components/PreRideLandmarkDrawer';
 import IsochronalSearchPanel from './plugins/aiTravel/components/IsochronalSearchPanel';
 import VoiceCopilotFAB from './plugins/aiTravel/components/VoiceCopilotFAB';
+
 const App = () => {
   const [type, setType] = useState('restaurants');
   const [rating, setRating] = useState('');
@@ -189,69 +190,69 @@ const App = () => {
   return (
     <ThemeProvider theme={theme}>
       <AITravelProvider>
-      <CssBaseline />
+        <CssBaseline />
 
-      {/* Background Map Layer */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1 }}>
-        <Map
-          setBounds={setBounds}
-          setCoords={setCoords}
-          coords={coords}
-          places={rating ? filteredPlaces : places}
-          setMap={setMap}
-          weatherData={weatherData}
-          airQuality={airQuality}
-          timeZoneId={timeZoneId}
-          locationName={locationName}
-          selectedDestination={selectedDestination}
-        />
-      </div>
-
-      {/* Floating UI Overlays */}
-      <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 2, overflow: 'hidden' }}>
-
-        {/* Left Side Dashboard Panel */}
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '400px',
-            height: '100vh',
-            pointerEvents: 'auto',
-            overflowY: 'hidden',
-            transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
-            transition: 'transform 0.3s ease-in-out',
-            zIndex: 10,
-          }}
-        >
-          <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
-            <Dashboard
-              isLoading={isLoading}
-              startingLocationName="Current Location"
-              destinationName={locationName}
-              weatherData={weatherData}
-              aiRecommendations={aiRecommendations}
-              selectedDestination={selectedDestination}
-              setSelectedDestination={setSelectedDestination}
-            />
-          </Paper>
+        {/* Background Map Layer */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 1 }}>
+          <Map
+            setBounds={setBounds}
+            setCoords={setCoords}
+            coords={coords}
+            places={rating ? filteredPlaces : places}
+            setMap={setMap}
+            weatherData={weatherData}
+            airQuality={airQuality}
+            timeZoneId={timeZoneId}
+            locationName={locationName}
+            selectedDestination={selectedDestination}
+          />
         </div>
 
-        {/* Floating Top Overlays (Search & Chips) */}
-        <div style={{ position: 'absolute', top: '20px', left: isDrawerOpen ? '420px' : '20px', pointerEvents: 'auto', transition: 'left 0.3s ease-in-out', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)} />
-          <CategoryChips type={type} setType={setType} rating={rating} setRating={setRating} />
+        {/* Floating UI Overlays */}
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 2, overflow: 'hidden' }}>
+
+          {/* Left Side Dashboard Panel */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '400px',
+              height: '100vh',
+              pointerEvents: 'auto',
+              overflowY: 'hidden',
+              transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
+              transition: 'transform 0.3s ease-in-out',
+              zIndex: 10,
+            }}
+          >
+            <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
+              <Dashboard
+                isLoading={isLoading}
+                startingLocationName="Current Location"
+                destinationName={locationName}
+                weatherData={weatherData}
+                aiRecommendations={aiRecommendations}
+                selectedDestination={selectedDestination}
+                setSelectedDestination={setSelectedDestination}
+              />
+            </Paper>
+          </div>
+
+          {/* Floating Top Overlays (Search & Chips) */}
+          <div style={{ position: 'absolute', top: '20px', left: isDrawerOpen ? '420px' : '20px', pointerEvents: 'auto', transition: 'left 0.3s ease-in-out', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)} />
+            <CategoryChips type={type} setType={setType} rating={rating} setRating={setRating} />
+          </div>
+
         </div>
 
-      </div>
+        <AIAssistant coords={coords} locationName={locationName} places={places} />
 
-      <AIAssistant coords={coords} locationName={locationName} places={places} />
-      
-      {/* AI Travel Guide Components */}
-      <VoiceCopilotFAB />
-      <PreRideLandmarkDrawer />
-      <IsochronalSearchPanel />
+        {/* AI Travel Guide Components */}
+        <VoiceCopilotFAB />
+        <PreRideLandmarkDrawer />
+        <IsochronalSearchPanel />
       </AITravelProvider>
     </ThemeProvider>
   );

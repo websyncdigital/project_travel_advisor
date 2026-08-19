@@ -1,7 +1,7 @@
 import React from 'react';
 import { Drawer, Typography, IconButton, Divider, Card, CardContent, Button } from '@material-ui/core';
-import { useAITravel } from '../context/AITravelContext';
 import CloseIcon from '@material-ui/icons/Close';
+import { useAITravel } from '../context/AITravelContext';
 
 const IsochronalSearchPanel = () => {
   const { isSearchPanelOpen, setIsSearchPanelOpen, venues, setRouteAndFetchLandmarks } = useAITravel();
@@ -28,7 +28,7 @@ const IsochronalSearchPanel = () => {
             </Card>
           ))}
           {venues.length === 0 && (
-             <Typography variant="body2" color="textSecondary">Run a search along the route to see venues within detour limits.</Typography>
+          <Typography variant="body2" color="textSecondary">Run a search along the route to see venues within detour limits.</Typography>
           )}
         </div>
       </div>

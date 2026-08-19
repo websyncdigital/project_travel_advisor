@@ -15,7 +15,7 @@ const VoiceCopilotFAB = () => {
       setTimeout(() => {
         setPulse(false);
         setIsVoiceCopilotActive(false);
-        executeVoiceCommand("Find vegetarian food with safe parking");
+        executeVoiceCommand('Find vegetarian food with safe parking');
       }, 2000);
     } else {
       setPulse(false);
@@ -24,8 +24,8 @@ const VoiceCopilotFAB = () => {
 
   return (
     <>
-      <Fab 
-        color={pulse ? "secondary" : "primary"} 
+      <Fab
+        color={pulse ? 'secondary' : 'primary'}
         style={{ position: 'fixed', bottom: 30, right: 30, zIndex: 1000 }}
         onClick={handleVoiceClick}
       >

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Drawer, List, ListItem, ListItemText, ListItemIcon, Typography, IconButton, Divider } from '@material-ui/core';
-import { useAITravel } from '../context/AITravelContext';
 import RoomIcon from '@material-ui/icons/Room';
 import CloseIcon from '@material-ui/icons/Close';
+import { useAITravel } from '../context/AITravelContext';
 
 const PreRideLandmarkDrawer = () => {
   const { isLandmarkDrawerOpen, setIsLandmarkDrawerOpen, landmarks } = useAITravel();
