@@ -8,7 +8,11 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+const aiTravelRouter = require('./plugins/aiTravel/routes/index.js');
+
 // Routes
+app.use('/api/v1/ai-travel', aiTravelRouter);
+
 app.get('/api/status', (req, res) => {
   res.json({ status: 'ok', message: 'API is running' });
 });

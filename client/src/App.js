@@ -10,6 +10,11 @@ import AIAssistant from './components/AIAssistant/AIAssistant';
 import theme from './theme';
 import { getSilentRecommendations } from './api/ai';
 
+// AI Travel Plugin Integrations
+import { AITravelProvider } from './plugins/aiTravel/context/AITravelContext';
+import PreRideLandmarkDrawer from './plugins/aiTravel/components/PreRideLandmarkDrawer';
+import IsochronalSearchPanel from './plugins/aiTravel/components/IsochronalSearchPanel';
+import VoiceCopilotFAB from './plugins/aiTravel/components/VoiceCopilotFAB';
 const App = () => {
   const [type, setType] = useState('restaurants');
   const [rating, setRating] = useState('');
@@ -183,6 +188,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
+      <AITravelProvider>
       <CssBaseline />
 
       {/* Background Map Layer */}
@@ -241,6 +247,12 @@ const App = () => {
       </div>
 
       <AIAssistant coords={coords} locationName={locationName} places={places} />
+      
+      {/* AI Travel Guide Components */}
+      <VoiceCopilotFAB />
+      <PreRideLandmarkDrawer />
+      <IsochronalSearchPanel />
+      </AITravelProvider>
     </ThemeProvider>
   );
 };
