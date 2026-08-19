@@ -14,7 +14,6 @@ import { getSilentRecommendations } from './api/ai';
 import { AITravelProvider } from './plugins/aiTravel/context/AITravelContext';
 import PreRideLandmarkDrawer from './plugins/aiTravel/components/PreRideLandmarkDrawer';
 import IsochronalSearchPanel from './plugins/aiTravel/components/IsochronalSearchPanel';
-import VoiceCopilotFAB from './plugins/aiTravel/components/VoiceCopilotFAB';
 
 const App = () => {
   const [type, setType] = useState('restaurants');
@@ -250,7 +249,6 @@ const App = () => {
         <AIAssistant coords={coords} locationName={locationName} places={places} />
 
         {/* AI Travel Guide Components */}
-        <VoiceCopilotFAB />
         <PreRideLandmarkDrawer />
         <IsochronalSearchPanel />
       </AITravelProvider>

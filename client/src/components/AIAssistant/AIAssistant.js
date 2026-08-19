@@ -2,10 +2,16 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Paper, Typography, InputBase, IconButton, Fab } from '@material-ui/core';
 import { Send, Chat as MessageCircle, Close as X, Mic, MicOff, CameraAlt } from '@material-ui/icons';
 import { startTravelChat, sendMultimodalMessage } from '../../api/ai';
+import { useAITravel } from '../../plugins/aiTravel/context/AITravelContext';
 import useStyles from './styles';
 
 const AIAssistant = ({ coords, locationName, places }) => {
   const classes = useStyles();
+  const travelContext = useAITravel();
+  const executeVoiceCommand = travelContext?.executeVoiceCommand;
+  const voiceCopilotMessage = travelContext?.voiceCopilotMessage;
+  const setVoiceCopilotMessage = travelContext?.setVoiceCopilotMessage;
+
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: 'model', text: 'Hello! I am your AI Travel Advisor. I am connected to Google\'s Grounding data, so I can find the best real-time spots for you anywhere in the world! Where are we exploring today?' },
@@ -69,6 +75,16 @@ const AIAssistant = ({ coords, locationName, places }) => {
   useEffect(() => {
     scrollToBottom();
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (voiceCopilotMessage) {
+      setMessages((prev) => [...prev, { role: 'model', text: `🚗 AI Travel Copilot: ${voiceCopilotMessage}` }]);
+      speak(`Copilot says: ${voiceCopilotMessage}`);
+      if (setVoiceCopilotMessage) {
+        setVoiceCopilotMessage('');
+      }
+    }
+  }, [voiceCopilotMessage, setVoiceCopilotMessage]);
 
   useEffect(() => {
     const initChat = async () => {
@@ -154,6 +170,11 @@ const AIAssistant = ({ coords, locationName, places }) => {
 
       setMessages((prev) => [...prev, { role: 'model', text: responseText }]);
       speak(responseText);
+
+      // Auto-trigger voice copilot for spatial parameters if it's connected
+      if (!currentImage && !currentFile && executeVoiceCommand) {
+        executeVoiceCommand(userMessage);
+      }
 
       // Log Interaction to Memory
       fetch('/api/scraper/memory', {
