@@ -66,34 +66,36 @@ const generateAiSuggestions = (placesList, categoryType = 'restaurants', locatio
     const priceLevel = place.price_level !== undefined && place.price_level !== null ? Number(place.price_level) : null;
     const isAiPicked = Boolean(aiPicks && aiPicks.some((pick) => pick.name === place.name || (pick.place_id && pick.place_id === place.place_id)));
 
-    // 1. Rating score (0 - 50 points)
-    const ratingScore = rating > 0 ? (rating / 5.0) * 50 : 25;
+    // 1. Rating score (0 - 45 points)
+    const ratingScore = rating > 0 ? (rating / 5.0) * 45 : 20;
 
-    // 2. Review volume confidence score (0 - 35 points)
-    const reviewScore = reviews > 0 ? Math.min(35, Math.log10(reviews + 1) * 10) : 5;
+    // 2. Review volume confidence score (0 - 30 points)
+    const reviewScore = reviews > 0 ? Math.min(30, Math.log10(reviews + 1) * 8.5) : 5;
 
-    // 3. Price-to-value score (0 - 10 points)
-    let priceScore = 7;
+    // 3. Price-to-quality & value score (0 - 15 points)
+    let priceScore = 10;
     let priceLabel = '';
     if (priceLevel === 1) {
-      priceScore = 10;
+      priceScore = 15;
       priceLabel = 'budget-friendly ($)';
     } else if (priceLevel === 2) {
-      priceScore = 8.5;
+      priceScore = 13;
       priceLabel = 'great value ($$)';
     } else if (priceLevel === 3) {
-      priceScore = 6;
+      priceScore = 9;
       priceLabel = 'upscale ($$$)';
     } else if (priceLevel >= 4) {
-      priceScore = 4;
+      priceScore = 7;
       priceLabel = 'premium ($$$$)';
     }
 
-    // 4. Operational and completeness bonus (photos, ai picks)
-    const completenessBonus = (place.photos && place.photos.length > 0 ? 3 : 0) + (isAiPicked ? 5 : 0);
+    // 4. Service & operational reliability score (0 - 10 points)
+    const serviceScore = (place.opening_hours?.open_now ? 3 : 1)
+      + (place.photos && place.photos.length > 0 ? 3 : 0)
+      + (isAiPicked ? 4 : 2);
 
-    const rawTotal = ratingScore + reviewScore + priceScore + completenessBonus;
-    const aiMatchScore = Math.min(99, Math.max(72, Math.round(rawTotal)));
+    const rawTotal = ratingScore + reviewScore + priceScore + serviceScore;
+    const aiMatchScore = Math.min(99, Math.max(75, Math.round(rawTotal)));
 
     // AI Badge determination
     let aiBadge = '🎯 AI Recommended';
@@ -103,35 +105,35 @@ const generateAiSuggestions = (placesList, categoryType = 'restaurants', locatio
       aiBadge = '⭐ Top Rated & Most Popular';
     } else if (rating >= 4.3) {
       aiBadge = '🌟 Exceptional Quality';
-    } else if (priceScore >= 8 && rating >= 3.8) {
+    } else if (priceScore >= 12 && rating >= 3.8) {
       aiBadge = '💎 Best Value for Money';
     } else if (reviews >= 100) {
       aiBadge = '🔥 Community Favorite';
     }
 
-    // Category-specific AI analysis explanation
+    // Category-specific AI analysis explanation factoring in ratings, reviews, price-to-quality, and service
     let analysisExplanation = '';
     const ratingText = rating > 0 ? `${rating.toFixed(1)}★ rating` : 'favorable feedback';
     const reviewsText = reviews > 0 ? `${reviews.toLocaleString()} verified reviews` : 'local visitor listings';
-    const priceText = priceLabel ? ` offering ${priceLabel}` : '';
+    const priceText = priceLabel ? ` with ${priceLabel}` : '';
 
     const catKey = (categoryType || '').toLowerCase();
     if (catKey.includes('restaurant') || catKey.includes('cafe') || catKey.includes('bar') || catKey.includes('coffee')) {
-      analysisExplanation = `Analyzed ${ratingText} across ${reviewsText}${priceText}. Highly recommended for taste, service consistency, and dining experience in ${location}.`;
+      analysisExplanation = `Analyzed ${ratingText} across ${reviewsText}${priceText}. Highly rated for food quality, dependable service, and great value in ${location}.`;
     } else if (catKey.includes('hotel') || catKey.includes('lodging')) {
-      analysisExplanation = `Evaluated ${ratingText} backed by ${reviewsText}${priceText}. Top recommendation for guest satisfaction, comfort, and hospitality.`;
+      analysisExplanation = `Evaluated ${ratingText} backed by ${reviewsText}${priceText}. Top recommendation for guest satisfaction, attentive service, and comfort.`;
     } else if (catKey.includes('attraction') || catKey.includes('things to do') || catKey.includes('museum')) {
-      analysisExplanation = `Scored ${ratingText} with ${reviewsText}. Outstanding visitor satisfaction index for activities and sightseeing.`;
+      analysisExplanation = `Scored ${ratingText} with ${reviewsText}. Outstanding visitor satisfaction index for activities, service, and sightseeing.`;
     } else if (catKey.includes('pharmacy') || catKey.includes('hospital')) {
-      analysisExplanation = `Verified ${ratingText} and ${reviewsText}. High community trust rating and medical service dependability in ${location}.`;
+      analysisExplanation = `Verified ${ratingText} and ${reviewsText}. High community trust rating, reliable service, and medical care in ${location}.`;
     } else if (catKey.includes('atm') || catKey.includes('bank')) {
-      analysisExplanation = `Rated ${ratingText} across ${reviewsText}. Excellent accessibility, operational reliability, and user convenience.`;
+      analysisExplanation = `Rated ${ratingText} across ${reviewsText}. Excellent accessibility, operational reliability, and dependable banking service.`;
     } else if (catKey.includes('gas') || catKey.includes('parking')) {
-      analysisExplanation = `Calculated ${ratingText} from ${reviewsText}${priceText}. Prompt service rating and high commuter reliability score.`;
+      analysisExplanation = `Calculated ${ratingText} from ${reviewsText}${priceText}. Prompt service rating, clean amenities, and high commuter dependability.`;
     } else if (catKey.includes('grocer') || catKey.includes('supermarket') || catKey.includes('post')) {
-      analysisExplanation = `Assessed ${ratingText} across ${reviewsText}. Strong local community recommendations for convenience and service quality.`;
+      analysisExplanation = `Assessed ${ratingText} across ${reviewsText}. Strong local community recommendations for product freshness, convenience, and service.`;
     } else {
-      analysisExplanation = `AI evaluated ${ratingText} and ${reviewsText}${priceText}. Strong performance across quality, value, and reliability metrics.`;
+      analysisExplanation = `AI evaluated ${ratingText} and ${reviewsText}${priceText}. Top performance across quality, value, and service metrics.`;
     }
 
     return {
@@ -144,8 +146,9 @@ const generateAiSuggestions = (placesList, categoryType = 'restaurants', locatio
     };
   });
 
+  // Sort by AI score descending and display ONLY the top 5 AI suggestions
   analyzed.sort((a, b) => b.sortScore - a.sortScore);
-  return analyzed;
+  return analyzed.slice(0, 5);
 };
 
 const Dashboard = ({
@@ -582,15 +585,15 @@ const Dashboard = ({
               <Box display="flex" alignItems="center" gap="6px" marginBottom="4px">
                 <StarsIcon style={{ color: '#fbbf24', fontSize: '18px' }} />
                 <Typography variant="subtitle2" style={{ color: '#f8fafc', fontWeight: 700, fontSize: '0.9rem' }}>
-                  AI Curated Suggestions
+                  Top 5 AI Suggestions
                 </Typography>
               </Box>
               <Typography variant="body2" style={{ color: '#cbd5e1', fontSize: '0.8rem', lineHeight: 1.45 }}>
-                AI evaluated ratings, verified reviews, and price-to-quality metrics for {categoryTitles[type] || 'places'} in {currentPlaceName}.
+                AI evaluated ratings, customer reviews, price-to-quality, and service consistency to select the top 5 {categoryTitles[type] || 'places'} in {currentPlaceName}.
               </Typography>
             </Box>
 
-            {/* Suggestions List */}
+            {/* Suggestions List (Top 5) */}
             {suggestedPlaces && suggestedPlaces.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {suggestedPlaces.map((place, i) => {
@@ -607,7 +610,7 @@ const Dashboard = ({
 
                   return (
                     <div ref={elRefs[targetIndex]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
-                      {/* AI Analysis Tag */}
+                      {/* AI Analysis Tag with Rank */}
                       <Box
                         style={{
                           backgroundColor: 'rgba(30, 27, 75, 0.85)',
@@ -621,6 +624,19 @@ const Dashboard = ({
                       >
                         <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="4px">
                           <Box display="flex" alignItems="center" gap="6px">
+                            <span
+                              style={{
+                                backgroundColor: '#fbbf24',
+                                color: '#0f172a',
+                                fontWeight: 800,
+                                fontSize: '0.72rem',
+                                padding: '1px 6px',
+                                borderRadius: '6px',
+                                lineHeight: '1.2',
+                              }}
+                            >
+                              #{i + 1}
+                            </span>
                             <StarsIcon style={{ color: '#fbbf24', fontSize: '16px' }} />
                             <Typography variant="subtitle2" style={{ color: '#c4b5fd', fontWeight: 700, fontSize: '0.82rem' }}>
                               {place.aiBadge}
