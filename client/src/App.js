@@ -36,6 +36,53 @@ const App = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
+    if (!navigator.geolocation) return () => {};
+
+    let lastLat = 11.3064;
+    let lastLng = 75.8650;
+
+    const watchId = navigator.geolocation.watchPosition(
+      (position) => {
+        const { latitude, longitude, accuracy, speed } = position.coords;
+
+        // Ignore inaccurate desktop Wi-Fi IP readings (> 500m) that jump to Arayidathupalam on load
+        if (accuracy && accuracy > 500) {
+          return;
+        }
+
+        // Calculate distance moved in km
+        const R = 6371;
+        const dLat = (latitude - lastLat) * (Math.PI / 180);
+        const dLon = (longitude - lastLng) * (Math.PI / 180);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+          + Math.cos(lastLat * (Math.PI / 180)) * Math.cos(latitude * (Math.PI / 180))
+          * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const distanceKm = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // When location moves dynamically (> 30 meters) or vehicle speed is detected:
+        if (distanceKm > 0.03 || (speed && speed > 0.5)) {
+          lastLat = latitude;
+          lastLng = longitude;
+          setCoords({ lat: latitude, lng: longitude });
+        }
+      },
+      (error) => {
+        // eslint-disable-next-line no-console
+        console.warn('Geolocation watch error:', error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 5000,
+        timeout: 10000,
+      },
+    );
+
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+    };
+  }, []);
+
+  useEffect(() => {
     if (coords.lat && coords.lng) {
       // 1. Weather API (Google Weather with Open-Meteo fallback)
       fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}&location.latitude=${coords.lat}&location.longitude=${coords.lng}`)
@@ -103,21 +150,35 @@ const App = () => {
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: coords }, (results, status) => {
           if (status === 'OK' && results && results.length > 0) {
+            const getDistanceKm = (lat1, lon1, lat2, lon2) => {
+              const R = 6371;
+              const dLat = (lat2 - lat1) * (Math.PI / 180);
+              const dLon = (lon2 - lon1) * (Math.PI / 180);
+              const a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+              return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            };
+
+            const distFromKunnamangalam = getDistanceKm(coords.lat, coords.lng, 11.3064, 75.8650);
+
             let cityName = '';
-            // Priority 1: Check across all results if address mentions Kunnamangalam
-            for (let i = 0; i < results.length; i += 1) {
-              const km = results[i].address_components?.find((c) => c.long_name && c.long_name.toLowerCase().includes('kunnamangalam'));
-              if (km) {
-                cityName = 'Kunnamangalam';
-                break;
+            // If within 2km of Kunnamangalam, prioritize Kunnamangalam over micro-landmarks like 'Polpaya Mana'
+            if (distFromKunnamangalam < 2) {
+              for (let i = 0; i < results.length; i += 1) {
+                const km = results[i].address_components?.find((c) => c.long_name && c.long_name.toLowerCase().includes('kunnamangalam'));
+                if (km) {
+                  cityName = 'Kunnamangalam';
+                  break;
+                }
               }
             }
 
-            // Priority 2: Look for locality or sublocality, avoiding micro-landmarks like 'Mana'
+            // Otherwise as the location moves, dynamically extract the new locality / sublocality / city
             if (!cityName) {
               for (let i = 0; i < results.length; i += 1) {
                 const loc = results[i].address_components?.find(
-                  (c) => (c.types.includes('locality') || c.types.includes('sublocality_level_1'))
+                  (c) => (c.types.includes('locality') || c.types.includes('sublocality_level_1') || c.types.includes('neighborhood') || c.types.includes('administrative_area_level_2'))
                     && !c.types.includes('plus_code')
                     && !c.long_name.toLowerCase().includes('mana'),
                 );
@@ -128,7 +189,10 @@ const App = () => {
               }
             }
 
-            // Fallback default to Kunnamangalam
+            if (!cityName && results[0]?.address_components?.[0]?.long_name) {
+              cityName = results[0].address_components[0].long_name;
+            }
+
             if (!cityName) {
               cityName = 'Kunnamangalam';
             }
@@ -137,7 +201,7 @@ const App = () => {
         });
       }
     }
-  }, [coords]);
+  }, [coords, map]);
 
   useEffect(() => {
     if (rating) {
@@ -156,20 +220,37 @@ const App = () => {
 
       const categoryTypeMapping = {
         restaurants: 'restaurant',
+        restaurant: 'restaurant',
         hotels: 'lodging',
+        lodging: 'lodging',
         attractions: 'tourist_attraction',
+        tourist_attraction: 'tourist_attraction',
+        'things to do': 'tourist_attraction',
         pharmacies: 'pharmacy',
+        pharmacy: 'pharmacy',
         atms: 'atm',
+        atm: 'atm',
+        gas: 'gas_station',
         'gas stations': 'gas_station',
+        gas_station: 'gas_station',
         museums: 'museum',
+        museum: 'museum',
         transit: 'transit_station',
+        transit_station: 'transit_station',
         bars: 'bar',
+        bar: 'bar',
         coffee: 'cafe',
+        cafe: 'cafe',
         groceries: 'grocery_or_supermarket',
+        grocery_or_supermarket: 'grocery_or_supermarket',
+        parking: 'parking',
         'parking lots': 'parking',
         banks: 'bank',
+        bank: 'bank',
         hospitals: 'hospital',
+        hospital: 'hospital',
         'post offices': 'post_office',
+        post_office: 'post_office',
       };
 
       const mappedType = categoryTypeMapping[type] || type;
