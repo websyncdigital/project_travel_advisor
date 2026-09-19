@@ -1,5 +1,5 @@
 import React, { useState, useEffect, createRef } from 'react';
-import { Typography, Paper, CircularProgress, Card, CardContent, Divider, Box } from '@material-ui/core';
+import { Typography, Paper, CircularProgress, Card, CardContent, Divider, Box, IconButton, Tooltip } from '@material-ui/core';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot } from '@material-ui/lab';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import DriveEtaIcon from '@material-ui/icons/DriveEta';
@@ -7,6 +7,9 @@ import CloudIcon from '@material-ui/icons/Cloud';
 import ExploreIcon from '@material-ui/icons/Explore';
 import AccessTimeIcon from '@material-ui/icons/AccessTime';
 import EcoIcon from '@material-ui/icons/Eco';
+import RemoveIcon from '@material-ui/icons/Remove';
+import AddIcon from '@material-ui/icons/Add';
+import AspectRatioIcon from '@material-ui/icons/AspectRatio';
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 
 const getAqiColor = (category) => {
@@ -67,6 +70,8 @@ const Dashboard = ({
   places,
   type,
   childClicked,
+  dashboardWidth = 400,
+  setDashboardWidth,
 }) => {
   const [elRefs, setElRefs] = useState([]);
 
@@ -171,16 +176,118 @@ const Dashboard = ({
         boxSizing: 'border-box',
       }}
     >
-      {/* 1. Header & Location Display */}
+      {/* 1. Header & Location Display with Width Controls */}
       <Box style={{ flexShrink: 0 }}>
-        <Typography variant="h4" style={{ fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.5px' }}>
-          Trip Dashboard
-        </Typography>
-        <Box display="flex" alignItems="center" gap="6px" style={{ marginTop: '4px' }}>
-          <LocationOnIcon style={{ color: '#38bdf8', fontSize: '18px' }} />
-          <Typography variant="subtitle1" style={{ color: '#94a3b8', fontWeight: 600 }}>
-            {currentPlaceName}
-          </Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" style={{ gap: '8px' }}>
+          <Box>
+            <Typography variant="h4" style={{ fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.5px' }}>
+              Trip Dashboard
+            </Typography>
+            <Box display="flex" alignItems="center" gap="6px" style={{ marginTop: '4px' }}>
+              <LocationOnIcon style={{ color: '#38bdf8', fontSize: '18px' }} />
+              <Typography variant="subtitle1" style={{ color: '#94a3b8', fontWeight: 600 }}>
+                {currentPlaceName}
+              </Typography>
+            </Box>
+          </Box>
+
+          {/* Width Adjustment Controls */}
+          {setDashboardWidth && (
+            <Box display="flex" flexDirection="column" alignItems="flex-end" style={{ gap: '4px' }}>
+              <Box
+                display="flex"
+                alignItems="center"
+                style={{
+                  backgroundColor: 'rgba(15, 23, 42, 0.65)',
+                  borderRadius: '8px',
+                  padding: '2px 4px',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(8px)',
+                }}
+              >
+                <Tooltip title="Decrease panel width (-50px)">
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={() => setDashboardWidth(dashboardWidth - 50)}
+                      disabled={dashboardWidth <= 320}
+                      style={{ color: dashboardWidth <= 320 ? '#475569' : '#94a3b8', padding: '4px' }}
+                      aria-label="decrease panel width"
+                    >
+                      <RemoveIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+
+                <Tooltip title="Click to reset width to default (400px)">
+                  <Typography
+                    variant="caption"
+                    onClick={() => setDashboardWidth(400)}
+                    style={{
+                      color: '#38bdf8',
+                      fontWeight: 600,
+                      padding: '0 6px',
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      fontSize: '0.75rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '3px',
+                    }}
+                  >
+                    <AspectRatioIcon style={{ fontSize: '13px' }} /> {dashboardWidth}px
+                  </Typography>
+                </Tooltip>
+
+                <Tooltip title="Increase panel width (+50px)">
+                  <span>
+                    <IconButton
+                      size="small"
+                      onClick={() => setDashboardWidth(dashboardWidth + 50)}
+                      disabled={dashboardWidth >= 850}
+                      style={{ color: dashboardWidth >= 850 ? '#475569' : '#94a3b8', padding: '4px' }}
+                      aria-label="increase panel width"
+                    >
+                      <AddIcon fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              </Box>
+
+              {/* Quick Width Presets */}
+              <Box display="flex" style={{ gap: '4px' }}>
+                {[
+                  { label: 'Compact', width: 340 },
+                  { label: 'Default', width: 400 },
+                  { label: 'Wide', width: 550 },
+                  { label: 'Max', width: 720 },
+                ].map((preset) => {
+                  const isActive = Math.abs(dashboardWidth - preset.width) < 25;
+                  return (
+                    <Typography
+                      key={preset.label}
+                      variant="caption"
+                      onClick={() => setDashboardWidth(preset.width)}
+                      style={{
+                        cursor: 'pointer',
+                        padding: '2px 6px',
+                        borderRadius: '4px',
+                        fontSize: '0.68rem',
+                        fontWeight: isActive ? 700 : 500,
+                        color: isActive ? '#38bdf8' : '#64748b',
+                        backgroundColor: isActive ? 'rgba(56, 189, 248, 0.15)' : 'transparent',
+                        border: isActive ? '1px solid rgba(56, 189, 248, 0.3)' : '1px solid transparent',
+                        userSelect: 'none',
+                        transition: 'all 0.15s ease',
+                      }}
+                    >
+                      {preset.label}
+                    </Typography>
+                  );
+                })}
+              </Box>
+            </Box>
+          )}
         </Box>
       </Box>
 

@@ -35,6 +35,65 @@ const App = () => {
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [childClicked, setChildClicked] = useState(null);
+  const [dashboardWidth, setDashboardWidth] = useState(() => {
+    try {
+      const saved = localStorage.getItem('travel_advisor_dashboard_width');
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!Number.isNaN(parsed) && parsed >= 320 && parsed <= 900) {
+          return parsed;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    return 400;
+  });
+  const [isResizing, setIsResizing] = useState(false);
+
+  const handleUpdateDashboardWidth = (newWidth) => {
+    const minW = 320;
+    const maxW = Math.min(850, Math.floor(window.innerWidth * 0.75));
+    const clamped = Math.max(minW, Math.min(maxW, Math.round(newWidth)));
+    setDashboardWidth(clamped);
+  };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('travel_advisor_dashboard_width', dashboardWidth.toString());
+    } catch (e) {
+      // ignore
+    }
+  }, [dashboardWidth]);
+
+  useEffect(() => {
+    if (!isResizing) return () => {};
+
+    const handlePointerMove = (e) => {
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      if (typeof clientX !== 'number') return;
+      const minW = 320;
+      const maxW = Math.min(850, Math.floor(window.innerWidth * 0.75));
+      const clamped = Math.max(minW, Math.min(maxW, clientX));
+      setDashboardWidth(clamped);
+    };
+
+    const handlePointerUp = () => {
+      setIsResizing(false);
+    };
+
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('mouseup', handlePointerUp);
+    window.addEventListener('touchmove', handlePointerMove);
+    window.addEventListener('touchend', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('mouseup', handlePointerUp);
+      window.removeEventListener('touchmove', handlePointerMove);
+      window.removeEventListener('touchend', handlePointerUp);
+    };
+  }, [isResizing]);
 
   useEffect(() => {
     if (!navigator.geolocation) return () => {};
@@ -331,16 +390,16 @@ const App = () => {
               position: 'absolute',
               top: 0,
               left: 0,
-              width: '400px',
+              width: `${dashboardWidth}px`,
               height: '100vh',
               pointerEvents: 'auto',
               overflowY: 'hidden',
               transform: isDrawerOpen ? 'translateX(0)' : 'translateX(-100%)',
-              transition: 'transform 0.3s ease-in-out',
+              transition: isResizing ? 'none' : 'transform 0.3s ease-in-out, width 0.2s ease-out',
               zIndex: 10,
             }}
           >
-            <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
+            <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0, position: 'relative' }}>
               <Dashboard
                 isLoading={isLoading}
                 startingLocationName={locationName || 'Kunnamangalam'}
@@ -355,12 +414,83 @@ const App = () => {
                 places={rating ? filteredPlaces : places}
                 type={type}
                 childClicked={childClicked}
+                dashboardWidth={dashboardWidth}
+                setDashboardWidth={handleUpdateDashboardWidth}
               />
+
+              {/* Vertical Resize Splitter on right edge */}
+              <div
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setIsResizing(true);
+                }}
+                onTouchStart={() => setIsResizing(true)}
+                onDoubleClick={() => handleUpdateDashboardWidth(400)}
+                title="Drag to resize Trip Dashboard width (Double-click to reset)"
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  right: 0,
+                  width: '12px',
+                  height: '100%',
+                  cursor: 'col-resize',
+                  zIndex: 30,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  background: isResizing ? 'rgba(56, 189, 248, 0.25)' : 'transparent',
+                  borderRight: isResizing ? '2px solid #38bdf8' : '1px solid rgba(255, 255, 255, 0.12)',
+                  transition: 'background 0.2s ease, border-color 0.2s ease',
+                  userSelect: 'none',
+                  touchAction: 'none',
+                }}
+              >
+                {/* Visual grab pill */}
+                <div
+                  style={{
+                    width: '4px',
+                    height: '36px',
+                    borderRadius: '2px',
+                    backgroundColor: isResizing ? '#38bdf8' : 'rgba(255, 255, 255, 0.3)',
+                    boxShadow: isResizing ? '0 0 8px #38bdf8' : 'none',
+                    transition: 'all 0.2s ease',
+                  }}
+                />
+              </div>
             </Paper>
           </div>
 
+          {/* Fullscreen drag overlay to ensure seamless mouse movement tracking across map iframes */}
+          {isResizing && (
+            <div
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                cursor: 'col-resize',
+                zIndex: 99999,
+                userSelect: 'none',
+                pointerEvents: 'all',
+              }}
+            />
+          )}
+
           {/* Floating Top Overlays (Search & Chips) */}
-          <div style={{ position: 'absolute', top: '20px', left: isDrawerOpen ? '420px' : '20px', pointerEvents: 'auto', transition: 'left 0.3s ease-in-out', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div
+            style={{
+              position: 'absolute',
+              top: '20px',
+              left: isDrawerOpen ? `${dashboardWidth + 20}px` : '20px',
+              maxWidth: isDrawerOpen ? `calc(100vw - ${dashboardWidth + 40}px)` : 'calc(100vw - 40px)',
+              pointerEvents: 'auto',
+              transition: isResizing ? 'none' : 'left 0.2s ease-out',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+            }}
+          >
             <Header onPlaceChanged={onPlaceChanged} onLoad={onLoad} toggleDrawer={() => setIsDrawerOpen(!isDrawerOpen)} />
             <CategoryChips type={type} setType={setType} rating={rating} setRating={setRating} />
           </div>
