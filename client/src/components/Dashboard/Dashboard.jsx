@@ -10,7 +10,7 @@ import EcoIcon from '@material-ui/icons/Eco';
 import PlaceDetails from '../PlaceDetails/PlaceDetails';
 
 const getAqiColor = (category) => {
-  if (!category) return '#facc15';
+  if (typeof category !== 'string') return '#facc15';
   const cat = category.toLowerCase();
   if (cat.includes('good')) return '#4ade80';
   if (cat.includes('moderate')) return '#facc15';
@@ -70,30 +70,32 @@ const Dashboard = ({
     );
   }
 
-  // Extract Temperature
+  // Extract Temperature safely
   let temp = null;
-  if (weatherData?.temperature?.degrees != null) {
-    temp = Math.round(weatherData.temperature.degrees);
-  } else if (weatherData?.currentConditions?.temperatureC != null) {
-    temp = Math.round(weatherData.currentConditions.temperatureC);
-  } else if (typeof weatherData?.main?.temp === 'number') {
+  if (weatherData?.temperature?.degrees != null && !Number.isNaN(Number(weatherData.temperature.degrees))) {
+    temp = Math.round(Number(weatherData.temperature.degrees));
+  } else if (weatherData?.currentConditions?.temperatureC != null && !Number.isNaN(Number(weatherData.currentConditions.temperatureC))) {
+    temp = Math.round(Number(weatherData.currentConditions.temperatureC));
+  } else if (typeof weatherData?.main?.temp === 'number' && !Number.isNaN(weatherData.main.temp)) {
     temp = Math.round(weatherData.main.temp);
   }
 
-  // Extract Condition
+  // Extract Condition safely with type guards
   let condition = 'clear skies';
-  if (weatherData?.weatherCondition?.description) {
+  if (typeof weatherData?.weatherCondition?.description === 'string' && weatherData.weatherCondition.description) {
     condition = weatherData.weatherCondition.description.toLowerCase();
-  } else if (weatherData?.weatherCondition?.type) {
+  } else if (typeof weatherData?.weatherCondition?.description?.text === 'string' && weatherData.weatherCondition.description.text) {
+    condition = weatherData.weatherCondition.description.text.toLowerCase();
+  } else if (typeof weatherData?.weatherCondition?.type === 'string' && weatherData.weatherCondition.type) {
     const rawType = weatherData.weatherCondition.type.toLowerCase().replace(/_/g, ' ');
     condition = rawType === 'clear' ? 'clear skies' : rawType;
-  } else if (weatherData?.currentConditions?.condition) {
+  } else if (typeof weatherData?.currentConditions?.condition === 'string' && weatherData.currentConditions.condition) {
     condition = weatherData.currentConditions.condition.toLowerCase();
-  } else if (weatherData?.weather?.[0]?.description) {
+  } else if (typeof weatherData?.weather?.[0]?.description === 'string' && weatherData.weather[0].description) {
     condition = weatherData.weather[0].description.toLowerCase();
   }
 
-  const aqiCategory = airQuality?.category || 'Moderate air quality';
+  const aqiCategory = (typeof airQuality?.category === 'string' && airQuality.category) ? airQuality.category : 'Moderate air quality';
   const aqiScore = airQuality?.aqi || airQuality?.aqiDisplay || null;
 
   return (
