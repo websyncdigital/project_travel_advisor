@@ -144,7 +144,11 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           setCoords({ lat: e.center.lat, lng: e.center.lng });
           setBounds({ ne: e.marginBounds.ne, sw: e.marginBounds.sw });
         }}
-        onChildClick={(child) => setChildClicked(child)}
+        onChildClick={(child) => {
+          if (setChildClicked) {
+            setChildClicked(child);
+          }
+        }}
         yesIWantToUseGoogleMapApiInternals
         onGoogleApiLoaded={({ map }) => {
           setMap(map);
@@ -170,11 +174,26 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
               lat={Number(markerLat)}
               lng={Number(markerLng)}
               key={place.place_id || i}
+              style={{ cursor: 'pointer', zIndex: 10 }}
+              onClick={() => {
+                if (setChildClicked) {
+                  setChildClicked({ id: place.place_id || i, index: i, name: place.name, timestamp: Date.now() });
+                }
+              }}
             >
               {!matches
                 ? <LocationOnOutlinedIcon color="primary" fontSize="large" />
                 : (
-                  <Paper elevation={3} className={classes.paper}>
+                  <Paper
+                    elevation={3}
+                    className={classes.paper}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      if (setChildClicked) {
+                        setChildClicked({ id: place.place_id || i, index: i, name: place.name, timestamp: Date.now() });
+                      }
+                    }}
+                  >
                     <Typography className={classes.typography} variant="subtitle2" gutterBottom> {place.name}</Typography>
                     <img
                       className={classes.pointer}

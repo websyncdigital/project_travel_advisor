@@ -28,7 +28,13 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
   }
 
   return (
-    <Card elevation={6}>
+    <Card
+      elevation={selected ? 12 : 6}
+      style={{
+        border: selected ? '2px solid #38bdf8' : 'none',
+        transition: 'all 0.3s ease',
+      }}
+    >
       <CardMedia
         style={{ height: 350 }}
         image={placeImage}

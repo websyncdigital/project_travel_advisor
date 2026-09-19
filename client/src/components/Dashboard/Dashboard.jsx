@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, createRef } from 'react';
 import { Typography, Paper, CircularProgress, Card, CardContent, Divider, Box } from '@material-ui/core';
 import { Timeline, TimelineItem, TimelineSeparator, TimelineConnector, TimelineContent, TimelineDot } from '@material-ui/lab';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
@@ -66,7 +66,29 @@ const Dashboard = ({
   setSelectedDestination,
   places,
   type,
+  childClicked,
 }) => {
+  const [elRefs, setElRefs] = useState([]);
+
+  useEffect(() => {
+    setElRefs((refs) => Array(places?.length || 0).fill().map((_, i) => refs[i] || createRef()));
+  }, [places]);
+
+  useEffect(() => {
+    if (childClicked && places && places.length > 0) {
+      const selectedIndex = places.findIndex((p, idx) => (
+        childClicked === idx
+        || String(childClicked) === String(idx)
+        || (typeof childClicked === 'object' && childClicked.index === idx)
+        || (p.place_id && (childClicked === p.place_id || childClicked?.id === p.place_id))
+        || (p.name && (childClicked === p.name || childClicked?.name === p.name || String(childClicked).toLowerCase() === String(p.name).toLowerCase()))
+      ));
+
+      if (selectedIndex !== -1 && elRefs[selectedIndex]?.current) {
+        elRefs[selectedIndex].current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [childClicked, elRefs, places]);
   const [localTime, setLocalTime] = useState(() => {
     try {
       return new Intl.DateTimeFormat('en-US', {
@@ -259,15 +281,30 @@ const Dashboard = ({
 
         {places && places.length > 0 ? (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {places.map((place, i) => (
-              <PlaceDetails
-                key={place.place_id || i}
-                place={place}
-                isAiPick={Boolean(aiRecommendations?.some((rec) => rec.name === place.name))}
-                selectedDestination={selectedDestination}
-                setSelectedDestination={setSelectedDestination}
-              />
-            ))}
+            {places.map((place, i) => {
+              const isSelected = Boolean(
+                childClicked && (
+                  childClicked === i
+                  || String(childClicked) === String(i)
+                  || (typeof childClicked === 'object' && childClicked.index === i)
+                  || (place.place_id && (childClicked === place.place_id || childClicked?.id === place.place_id))
+                  || (place.name && (childClicked === place.name || childClicked?.name === place.name || String(childClicked).toLowerCase() === String(place.name).toLowerCase()))
+                ),
+              );
+
+              return (
+                <div ref={elRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
+                  <PlaceDetails
+                    place={place}
+                    selected={isSelected}
+                    refProp={elRefs[i]}
+                    isAiPick={Boolean(aiRecommendations?.some((rec) => rec.name === place.name))}
+                    selectedDestination={selectedDestination}
+                    setSelectedDestination={setSelectedDestination}
+                  />
+                </div>
+              );
+            })}
           </div>
         ) : (
           <Typography variant="body2" color="textSecondary">

@@ -34,6 +34,7 @@ const App = () => {
   const [map, setMap] = useState(null);
   const [selectedDestination, setSelectedDestination] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [childClicked, setChildClicked] = useState(null);
 
   useEffect(() => {
     if (!navigator.geolocation) return () => {};
@@ -317,6 +318,7 @@ const App = () => {
             timeZoneId={timeZoneId}
             locationName={locationName}
             selectedDestination={selectedDestination}
+            setChildClicked={setChildClicked}
           />
         </div>
 
@@ -352,6 +354,7 @@ const App = () => {
                 setSelectedDestination={setSelectedDestination}
                 places={rating ? filteredPlaces : places}
                 type={type}
+                childClicked={childClicked}
               />
             </Paper>
           </div>
