@@ -98,18 +98,47 @@ const Dashboard = ({
   const aqiCategory = (typeof airQuality?.category === 'string' && airQuality.category) ? airQuality.category : 'Moderate air quality';
   const aqiScore = airQuality?.aqi || airQuality?.aqiDisplay || null;
 
-  return (
-    <div style={{ padding: '24px', height: '100%', display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <Typography variant="h4" style={{ fontWeight: 700, color: '#f8fafc' }}>
-        Trip Dashboard
-      </Typography>
+  const currentPlaceName = locationName || startingLocationName || 'Kozhikode';
 
-      {/* Weather, Local Time & Environment Card */}
-      <Card elevation={0} style={{ backgroundColor: 'rgba(30, 41, 59, 0.7)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.08)' }}>
+  return (
+    <div
+      style={{
+        padding: '20px',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px',
+        overflowY: 'auto',
+        boxSizing: 'border-box',
+      }}
+    >
+      {/* 1. Header & Location Display */}
+      <Box style={{ flexShrink: 0 }}>
+        <Typography variant="h4" style={{ fontWeight: 700, color: '#f8fafc', letterSpacing: '-0.5px' }}>
+          Trip Dashboard
+        </Typography>
+        <Box display="flex" alignItems="center" gap="6px" style={{ marginTop: '4px' }}>
+          <LocationOnIcon style={{ color: '#38bdf8', fontSize: '18px' }} />
+          <Typography variant="subtitle1" style={{ color: '#94a3b8', fontWeight: 600 }}>
+            {currentPlaceName}
+          </Typography>
+        </Box>
+      </Box>
+
+      {/* 2. Weather, Local Time & Environment Card */}
+      <Card
+        elevation={0}
+        style={{
+          flexShrink: 0,
+          backgroundColor: 'rgba(30, 41, 59, 0.75)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.08)',
+        }}
+      >
         <CardContent style={{ padding: '16px' }}>
           <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom="8px">
             <Typography variant="h6" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.05rem', fontWeight: 600, color: '#f8fafc' }}>
-              <CloudIcon color="primary" fontSize="small" /> Weather at {destinationName || startingLocationName || locationName || 'Current Location'}
+              <CloudIcon color="primary" fontSize="small" /> Weather at {currentPlaceName}
             </Typography>
             <Typography variant="caption" style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#94a3b8', fontSize: '0.8rem', fontWeight: 500 }}>
               <AccessTimeIcon style={{ fontSize: '14px' }} /> {localTime}
@@ -135,12 +164,21 @@ const Dashboard = ({
         </CardContent>
       </Card>
 
-      {/* Interactive Journey Timeline */}
-      <Paper elevation={0} style={{ padding: '16px', flexShrink: 0 }}>
-        <Typography variant="h6" gutterBottom>
+      {/* 3. Interactive Journey Timeline */}
+      <Paper
+        elevation={0}
+        style={{
+          padding: '16px',
+          flexShrink: 0,
+          borderRadius: '12px',
+          backgroundColor: 'rgba(30, 41, 59, 0.5)',
+          border: '1px solid rgba(255, 255, 255, 0.05)',
+        }}
+      >
+        <Typography variant="h6" gutterBottom style={{ fontSize: '1rem', fontWeight: 600, color: '#f8fafc' }}>
           Your Journey
         </Typography>
-        <Timeline align="left" style={{ padding: 0 }}>
+        <Timeline align="left" style={{ padding: 0, margin: 0 }}>
           <TimelineItem>
             <TimelineSeparator>
               <TimelineDot color="primary"><LocationOnIcon /></TimelineDot>
@@ -148,7 +186,7 @@ const Dashboard = ({
             </TimelineSeparator>
             <TimelineContent>
               <Typography variant="subtitle1" fontWeight="bold">Start</Typography>
-              <Typography color="textSecondary" variant="body2">{startingLocationName || 'Current Location'}</Typography>
+              <Typography color="textSecondary" variant="body2">Current Location ({currentPlaceName})</Typography>
             </TimelineContent>
           </TimelineItem>
 
@@ -169,16 +207,16 @@ const Dashboard = ({
             </TimelineSeparator>
             <TimelineContent>
               <Typography variant="subtitle1" fontWeight="bold">Destination</Typography>
-              <Typography color="textSecondary" variant="body2">{destinationName || 'Select a destination'}</Typography>
+              <Typography color="textSecondary" variant="body2">{destinationName || currentPlaceName || 'Select a destination'}</Typography>
             </TimelineContent>
           </TimelineItem>
         </Timeline>
       </Paper>
 
-      {/* AI Smart Recommendations */}
-      <Box style={{ flexGrow: 1, overflowY: 'auto' }}>
-        <Typography variant="h6" gutterBottom style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ExploreIcon color="secondary" /> AI Recommendations
+      {/* 4. AI Smart Recommendations */}
+      <Box style={{ flexShrink: 0 }}>
+        <Typography variant="h6" gutterBottom style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', fontWeight: 600, color: '#f8fafc' }}>
+          <ExploreIcon color="secondary" fontSize="small" /> AI Recommendations
         </Typography>
         <Divider style={{ marginBottom: '16px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
 

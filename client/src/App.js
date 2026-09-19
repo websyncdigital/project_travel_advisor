@@ -19,15 +19,15 @@ const App = () => {
   const [type, setType] = useState('restaurants');
   const [rating, setRating] = useState('');
 
-  const [coords, setCoords] = useState({});
+  const [coords, setCoords] = useState({ lat: 11.2588, lng: 75.7804 });
   const [bounds, setBounds] = useState(null);
 
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
   const [weatherData, setWeatherData] = useState(null);
   const [airQuality, setAirQuality] = useState(null);
-  const [timeZoneId, setTimeZoneId] = useState(null);
-  const [locationName, setLocationName] = useState('');
+  const [timeZoneId, setTimeZoneId] = useState('Asia/Calcutta');
+  const [locationName, setLocationName] = useState('Kozhikode');
 
   const [autocomplete, setAutocomplete] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -264,9 +264,9 @@ const App = () => {
             <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
               <Dashboard
                 isLoading={isLoading}
-                startingLocationName="Current Location"
-                destinationName={locationName}
-                locationName={locationName}
+                startingLocationName={locationName || 'Kozhikode'}
+                destinationName={selectedDestination ? (selectedDestination.name || selectedDestination.formatted_address) : (locationName || 'Kozhikode')}
+                locationName={locationName || 'Kozhikode'}
                 weatherData={weatherData}
                 airQuality={airQuality}
                 timeZoneId={timeZoneId}
