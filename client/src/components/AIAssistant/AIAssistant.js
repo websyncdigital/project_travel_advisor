@@ -110,6 +110,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
               corpus = data.corpus || '';
             }
           } catch (e) {
+            // eslint-disable-next-line no-console
             console.warn('Could not load corpus from python backend');
           }
 
@@ -198,6 +199,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ log: `User: ${userMessage}\nAgent: ${responseText}` }),
+        // eslint-disable-next-line no-console
       }).catch((err) => console.warn('Failed to save memory', err));
 
       // Auto-scan URLs if user provides them
@@ -207,6 +209,7 @@ const AIAssistant = ({ coords, locationName, places }) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url: urlMatch[0] }),
+          // eslint-disable-next-line no-console
         }).catch((err) => console.warn('Failed to trigger scan', err));
       }
     } catch (error) {
