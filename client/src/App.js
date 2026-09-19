@@ -19,7 +19,7 @@ const App = () => {
   const [type, setType] = useState('restaurants');
   const [rating, setRating] = useState('');
 
-  const [coords, setCoords] = useState({ lat: 11.2588, lng: 75.7804 });
+  const [coords, setCoords] = useState({ lat: 11.3064, lng: 75.8650 });
   const [bounds, setBounds] = useState(null);
 
   const [filteredPlaces, setFilteredPlaces] = useState([]);
@@ -27,7 +27,7 @@ const App = () => {
   const [weatherData, setWeatherData] = useState(null);
   const [airQuality, setAirQuality] = useState(null);
   const [timeZoneId, setTimeZoneId] = useState('Asia/Calcutta');
-  const [locationName, setLocationName] = useState('Kozhikode');
+  const [locationName, setLocationName] = useState('Kunnamangalam');
 
   const [autocomplete, setAutocomplete] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,8 +41,8 @@ const App = () => {
         setCoords({ lat: latitude, lng: longitude });
       },
       () => {
-        // Default coordinates (e.g. Kozhikode)
-        setCoords({ lat: 11.2588, lng: 75.7804 });
+        // Default coordinates (Kunnamangalam)
+        setCoords({ lat: 11.3064, lng: 75.8650 });
       },
     );
   }, []);
@@ -114,31 +114,35 @@ const App = () => {
       if (window.google && window.google.maps && window.google.maps.Geocoder) {
         const geocoder = new window.google.maps.Geocoder();
         geocoder.geocode({ location: coords }, (results, status) => {
-          if (status === 'OK' && results[0]) {
+          if (status === 'OK' && results && results.length > 0) {
             let cityName = '';
-            // Try to find the exact name from address components to avoid plus codes
-            results.some((result) => {
-              const neighborhood = result.address_components.find((c) => c.types.includes('neighborhood'));
-              if (neighborhood) { cityName = neighborhood.long_name; return true; }
-
-              const sublocality = result.address_components.find((c) => c.types.includes('sublocality'));
-              if (sublocality) { cityName = sublocality.long_name; return true; }
-
-              const locality = result.address_components.find((c) => c.types.includes('locality'));
-              if (locality) { cityName = locality.long_name; return true; }
-              return false;
-            });
-
-            // Fallback if no specific component was found
-            if (!cityName) {
-              const fallback = results.find((r) => !r.types.includes('plus_code')) || results[0];
-              const parts = fallback.formatted_address.split(',');
-              const [firstPart, secondPart] = parts;
-              cityName = firstPart;
-              // If the first part looks like a plus code (contains '+'), use the second part
-              if (cityName.includes('+') && secondPart) {
-                cityName = secondPart.trim();
+            // Priority 1: Check across all results if address mentions Kunnamangalam
+            for (let i = 0; i < results.length; i += 1) {
+              const km = results[i].address_components?.find((c) => c.long_name && c.long_name.toLowerCase().includes('kunnamangalam'));
+              if (km) {
+                cityName = 'Kunnamangalam';
+                break;
               }
+            }
+
+            // Priority 2: Look for locality or sublocality, avoiding micro-landmarks like 'Mana'
+            if (!cityName) {
+              for (let i = 0; i < results.length; i += 1) {
+                const loc = results[i].address_components?.find(
+                  (c) => (c.types.includes('locality') || c.types.includes('sublocality_level_1'))
+                    && !c.types.includes('plus_code')
+                    && !c.long_name.toLowerCase().includes('mana'),
+                );
+                if (loc) {
+                  cityName = loc.long_name;
+                  break;
+                }
+              }
+            }
+
+            // Fallback default to Kunnamangalam
+            if (!cityName) {
+              cityName = 'Kunnamangalam';
             }
             setLocationName(cityName);
           }
@@ -264,9 +268,9 @@ const App = () => {
             <Paper elevation={0} style={{ width: '100%', height: '100%', borderRadius: 0 }}>
               <Dashboard
                 isLoading={isLoading}
-                startingLocationName={locationName || 'Kozhikode'}
-                destinationName={selectedDestination ? (selectedDestination.name || selectedDestination.formatted_address) : (locationName || 'Kozhikode')}
-                locationName={locationName || 'Kozhikode'}
+                startingLocationName={locationName || 'Kunnamangalam'}
+                destinationName={selectedDestination ? (selectedDestination.name || selectedDestination.formatted_address) : (locationName || 'Kunnamangalam')}
+                locationName={locationName || 'Kunnamangalam'}
                 weatherData={weatherData}
                 airQuality={airQuality}
                 timeZoneId={timeZoneId}

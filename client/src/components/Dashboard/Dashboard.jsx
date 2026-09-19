@@ -98,7 +98,7 @@ const Dashboard = ({
   const aqiCategory = (typeof airQuality?.category === 'string' && airQuality.category) ? airQuality.category : 'Moderate air quality';
   const aqiScore = airQuality?.aqi || airQuality?.aqiDisplay || null;
 
-  const currentPlaceName = locationName || startingLocationName || 'Kozhikode';
+  const currentPlaceName = locationName || startingLocationName || 'Kunnamangalam';
 
   return (
     <div
