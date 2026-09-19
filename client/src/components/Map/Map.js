@@ -160,28 +160,42 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
           setInternalMap(map);
         }}
       >
-        {places.length > 0 && places.map((place, i) => (
-          <div
-            className={classes.markerContainer}
-            lat={Number(place.geometry?.location?.lat() || place.latitude)}
-            lng={Number(place.geometry?.location?.lng() || place.longitude)}
-            key={i}
-          >
-            {!matches
-              ? <LocationOnOutlinedIcon color="primary" fontSize="large" />
-              : (
-                <Paper elevation={3} className={classes.paper}>
-                  <Typography className={classes.typography} variant="subtitle2" gutterBottom> {place.name}</Typography>
-                  <img
-                    className={classes.pointer}
-                    src={place.photos ? place.photos[0].getUrl() : 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80'}
-                    alt={place.name}
-                  />
-                  <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
-                </Paper>
-              )}
-          </div>
-        ))}
+        {places.length > 0 && places.map((place, i) => {
+          const markerLat = typeof place.geometry?.location?.lat === 'function'
+            ? place.geometry.location.lat()
+            : (place.geometry?.location?.lat || place.latitude);
+          const markerLng = typeof place.geometry?.location?.lng === 'function'
+            ? place.geometry.location.lng()
+            : (place.geometry?.location?.lng || place.longitude);
+
+          let markerImg = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80';
+          if (place.photos && place.photos.length > 0 && typeof place.photos[0].getUrl === 'function') {
+            markerImg = place.photos[0].getUrl();
+          }
+
+          return (
+            <div
+              className={classes.markerContainer}
+              lat={Number(markerLat)}
+              lng={Number(markerLng)}
+              key={place.place_id || i}
+            >
+              {!matches
+                ? <LocationOnOutlinedIcon color="primary" fontSize="large" />
+                : (
+                  <Paper elevation={3} className={classes.paper}>
+                    <Typography className={classes.typography} variant="subtitle2" gutterBottom> {place.name}</Typography>
+                    <img
+                      className={classes.pointer}
+                      src={markerImg}
+                      alt={place.name}
+                    />
+                    <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
+                  </Paper>
+                )}
+            </div>
+          );
+        })}
         {weatherData?.weatherCondition && (
           <div lat={coords.lat} lng={coords.lng}>
             <img src={`${weatherData.weatherCondition.iconBaseUri}.png`} alt={weatherData.weatherCondition.description?.text} height="70px" />

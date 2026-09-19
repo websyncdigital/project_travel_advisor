@@ -6,17 +6,25 @@ import Rating from '@material-ui/lab/Rating';
 
 import useStyles from './styles.js';
 
-const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, selectedDestination }) => {
+const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, selectedDestination, isAiPick }) => {
   React.useEffect(() => {
     if (selected) refProp?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [selected, refProp]);
   const classes = useStyles();
 
   let placeImage = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1650&q=80';
-  if (place.photos) {
-    placeImage = place.photos[0].getUrl();
-  } else if (place.geometry) {
-    placeImage = `https://maps.googleapis.com/maps/api/streetview?size=400x400&location=${place.geometry?.location?.lat()},${place.geometry?.location?.lng()}&key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`;
+  if (place.photos && place.photos.length > 0) {
+    if (typeof place.photos[0].getUrl === 'function') {
+      placeImage = place.photos[0].getUrl();
+    } else if (place.photos[0].url) {
+      placeImage = place.photos[0].url;
+    }
+  } else if (place.geometry?.location) {
+    const lat = typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat;
+    const lng = typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng;
+    if (lat && lng) {
+      placeImage = `https://maps.googleapis.com/maps/api/streetview?size=400x400&location=${lat},${lng}&key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}`;
+    }
   }
 
   return (
@@ -27,7 +35,14 @@ const PlaceDetails = ({ place, selected, refProp, setSelectedDestination, select
         title={place.name}
       />
       <CardContent>
-        <Typography gutterBottom variant="h5">{place.name}</Typography>
+        <Box display="flex" justifyContent="space-between" alignItems="flex-start" marginBottom="8px">
+          <Typography gutterBottom variant="h5" style={{ margin: 0, fontSize: '1.25rem' }}>{place.name}</Typography>
+          {isAiPick && (
+            <Typography variant="caption" style={{ backgroundColor: '#7c3aed', color: '#fff', padding: '2px 8px', borderRadius: '12px', fontWeight: 600, whiteSpace: 'nowrap', marginLeft: '8px' }}>
+              ✨ AI Pick
+            </Typography>
+          )}
+        </Box>
         <Box display="flex" justifyContent="space-between" my={2}>
           <Rating name="read-only" size="small" value={Number(place.rating)} readOnly />
           <Typography component="legend">{place.num_reviews} review{place.num_reviews > 1 && 's'}</Typography>

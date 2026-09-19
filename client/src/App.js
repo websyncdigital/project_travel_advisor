@@ -20,7 +20,7 @@ const App = () => {
   const [rating, setRating] = useState('');
 
   const [coords, setCoords] = useState({ lat: 11.3064, lng: 75.8650 });
-  const [bounds, setBounds] = useState(null);
+  const [, setBounds] = useState(null);
 
   const [filteredPlaces, setFilteredPlaces] = useState([]);
   const [places, setPlaces] = useState([]);
@@ -161,35 +161,39 @@ const App = () => {
   }, [rating, places]);
 
   useEffect(() => {
-    if (bounds && map && !selectedDestination) {
+    if (coords && map && !selectedDestination) {
       setIsLoading(true);
 
       const service = new window.google.maps.places.PlacesService(map);
 
-      let mappedType = type;
-      if (type === 'restaurants') mappedType = 'restaurant';
-      else if (type === 'hotels') mappedType = 'lodging';
-      else if (type === 'attractions') mappedType = 'tourist_attraction';
-      else if (type === 'bars') mappedType = 'bar';
-      else if (type === 'coffee') mappedType = 'cafe';
-      else if (type === 'banks') mappedType = 'bank';
-      else if (type === 'gas stations') mappedType = 'gas_station';
-      else if (type === 'parking lots') mappedType = 'parking';
-      else if (type === 'groceries') mappedType = 'supermarket';
-      else if (type === 'post offices') mappedType = 'post_office';
-      else if (type === 'hospitals') mappedType = 'hospital';
+      const categoryTypeMapping = {
+        restaurants: 'restaurant',
+        hotels: 'lodging',
+        attractions: 'tourist_attraction',
+        pharmacies: 'pharmacy',
+        atms: 'atm',
+        'gas stations': 'gas_station',
+        museums: 'museum',
+        transit: 'transit_station',
+        bars: 'bar',
+        coffee: 'cafe',
+        groceries: 'grocery_or_supermarket',
+        'parking lots': 'parking',
+        banks: 'bank',
+        hospitals: 'hospital',
+        'post offices': 'post_office',
+      };
+
+      const mappedType = categoryTypeMapping[type] || type;
 
       const request = {
-        bounds: new window.google.maps.LatLngBounds(
-          new window.google.maps.LatLng(bounds.sw.lat, bounds.sw.lng),
-          new window.google.maps.LatLng(bounds.ne.lat, bounds.ne.lng),
-        ),
+        location: new window.google.maps.LatLng(coords.lat, coords.lng),
+        radius: 5000,
         type: mappedType,
       };
 
       service.nearbySearch(request, (results, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK && results) {
-          // Add dummy fields to match the old interface where possible
+        if (status === window.google.maps.places.PlacesServiceStatus.OK && results && results.length > 0) {
           const transformedPlaces = results.map((p) => ({
             ...p,
             num_reviews: p.user_ratings_total || 0,
@@ -201,7 +205,7 @@ const App = () => {
         setIsLoading(false);
       });
     }
-  }, [bounds, type, map]);
+  }, [type, map, coords, selectedDestination]);
 
   const onLoad = (autoC) => setAutocomplete(autoC);
 
@@ -277,6 +281,8 @@ const App = () => {
                 aiRecommendations={aiRecommendations}
                 selectedDestination={selectedDestination}
                 setSelectedDestination={setSelectedDestination}
+                places={rating ? filteredPlaces : places}
+                type={type}
               />
             </Paper>
           </div>

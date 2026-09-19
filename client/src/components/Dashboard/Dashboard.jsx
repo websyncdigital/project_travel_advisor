@@ -18,6 +18,24 @@ const getAqiColor = (category) => {
   return '#facc15';
 };
 
+const categoryTitles = {
+  restaurants: 'Restaurants',
+  hotels: 'Hotels',
+  attractions: 'Things to do',
+  pharmacies: 'Pharmacies',
+  atms: 'ATMs',
+  'gas stations': 'Gas',
+  museums: 'Museums',
+  transit: 'Transit',
+  bars: 'Bars',
+  coffee: 'Coffee',
+  groceries: 'Groceries',
+  'parking lots': 'Parking',
+  banks: 'Banks',
+  hospitals: 'Hospitals',
+  'post offices': 'Post Offices',
+};
+
 const Dashboard = ({
   isLoading,
   startingLocationName,
@@ -29,6 +47,8 @@ const Dashboard = ({
   aiRecommendations,
   selectedDestination,
   setSelectedDestination,
+  places,
+  type,
 }) => {
   const [localTime, setLocalTime] = useState(() => {
     try {
@@ -213,19 +233,20 @@ const Dashboard = ({
         </Timeline>
       </Paper>
 
-      {/* 4. AI Smart Recommendations */}
+      {/* 4. Places List for Selected Category */}
       <Box style={{ flexShrink: 0 }}>
         <Typography variant="h6" gutterBottom style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1rem', fontWeight: 600, color: '#f8fafc' }}>
-          <ExploreIcon color="secondary" fontSize="small" /> AI Recommendations
+          <ExploreIcon color="secondary" fontSize="small" /> {categoryTitles[type] || 'Places'} {places && places.length > 0 ? `(${places.length})` : ''}
         </Typography>
         <Divider style={{ marginBottom: '16px', backgroundColor: 'rgba(255,255,255,0.1)' }} />
 
-        {aiRecommendations && aiRecommendations.length > 0 ? (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {aiRecommendations.map((rec, i) => (
+        {places && places.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {places.map((place, i) => (
               <PlaceDetails
-                key={i}
-                place={rec}
+                key={place.place_id || i}
+                place={place}
+                isAiPick={Boolean(aiRecommendations?.some((rec) => rec.name === place.name))}
                 selectedDestination={selectedDestination}
                 setSelectedDestination={setSelectedDestination}
               />
@@ -233,7 +254,7 @@ const Dashboard = ({
           </div>
         ) : (
           <Typography variant="body2" color="textSecondary">
-            AI is analyzing the area to provide personalized recommendations...
+            {isLoading ? 'Searching nearby places...' : `No ${categoryTitles[type]?.toLowerCase() || 'places'} found in this area.`}
           </Typography>
         )}
       </Box>
