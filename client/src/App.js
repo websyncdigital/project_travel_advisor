@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CssBaseline, Paper } from '@material-ui/core';
 import { ThemeProvider } from '@material-ui/core/styles';
 
@@ -8,7 +8,7 @@ import Map from './components/Map/Map';
 import CategoryChips from './components/CategoryChips/CategoryChips';
 import AIAssistant from './components/AIAssistant/AIAssistant';
 import theme from './theme';
-import { getSilentRecommendations } from './api/ai';
+import { getSilentRecommendations, generateAiSuggestions } from './api/ai';
 
 // AI Travel Plugin Integrations
 import { AITravelProvider } from './plugins/aiTravel/context/AITravelContext';
@@ -339,6 +339,21 @@ const App = () => {
   const onLoad = (autoC) => setAutocomplete(autoC);
 
   const [aiRecommendations, setAiRecommendations] = useState([]);
+  const [activeTab, setActiveTab] = useState('all');
+
+  useEffect(() => {
+    setActiveTab('all');
+  }, [type]);
+
+  const currentPlaces = rating ? filteredPlaces : places;
+
+  const suggestedPlaces = useMemo(() => (
+    generateAiSuggestions(currentPlaces, type, locationName || 'Kunnamangalam', aiRecommendations)
+  ), [currentPlaces, type, locationName, aiRecommendations]);
+
+  const mapPlaces = useMemo(() => (
+    activeTab === 'suggestions' ? suggestedPlaces : currentPlaces
+  ), [activeTab, suggestedPlaces, currentPlaces]);
 
   useEffect(() => {
     if (places && places.length > 0 && weatherData) {
@@ -370,7 +385,7 @@ const App = () => {
             setBounds={setBounds}
             setCoords={setCoords}
             coords={coords}
-            places={rating ? filteredPlaces : places}
+            places={mapPlaces}
             setMap={setMap}
             weatherData={weatherData}
             airQuality={airQuality}
@@ -411,7 +426,10 @@ const App = () => {
                 aiRecommendations={aiRecommendations}
                 selectedDestination={selectedDestination}
                 setSelectedDestination={setSelectedDestination}
-                places={rating ? filteredPlaces : places}
+                places={currentPlaces}
+                suggestedPlaces={suggestedPlaces}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
                 type={type}
                 childClicked={childClicked}
                 dashboardWidth={dashboardWidth}

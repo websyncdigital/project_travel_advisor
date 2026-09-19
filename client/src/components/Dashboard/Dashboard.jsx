@@ -163,25 +163,52 @@ const Dashboard = ({
   selectedDestination,
   setSelectedDestination,
   places,
+  suggestedPlaces: propSuggestedPlaces,
+  activeTab: propActiveTab,
+  setActiveTab: propSetActiveTab,
   type,
   childClicked,
   dashboardWidth = 400,
   setDashboardWidth,
 }) => {
   const currentPlaceName = locationName || startingLocationName || 'Kunnamangalam';
-  const [activeTab, setActiveTab] = useState('all');
+  const [localActiveTab, setLocalActiveTab] = useState('all');
+  const activeTab = propActiveTab !== undefined ? propActiveTab : localActiveTab;
+  const setActiveTab = propSetActiveTab !== undefined ? propSetActiveTab : setLocalActiveTab;
+
   const [elRefs, setElRefs] = useState([]);
+  const [suggestionRefs, setSuggestionRefs] = useState([]);
 
   const suggestedPlaces = useMemo(() => (
-    generateAiSuggestions(places, type, currentPlaceName, aiRecommendations)
-  ), [places, type, currentPlaceName, aiRecommendations]);
+    propSuggestedPlaces || generateAiSuggestions(places, type, currentPlaceName, aiRecommendations)
+  ), [propSuggestedPlaces, places, type, currentPlaceName, aiRecommendations]);
 
   useEffect(() => {
     setElRefs((refs) => Array(places?.length || 0).fill().map((_, i) => refs[i] || createRef()));
   }, [places]);
 
   useEffect(() => {
-    if (childClicked && places && places.length > 0) {
+    setSuggestionRefs((refs) => Array(suggestedPlaces?.length || 0).fill().map((_, i) => refs[i] || createRef()));
+  }, [suggestedPlaces]);
+
+  useEffect(() => {
+    if (!childClicked) return;
+
+    if (activeTab === 'suggestions') {
+      if (!suggestedPlaces || suggestedPlaces.length === 0) return;
+      const selectedIndex = suggestedPlaces.findIndex((p, idx) => (
+        childClicked === idx
+        || String(childClicked) === String(idx)
+        || (typeof childClicked === 'object' && childClicked.index === idx)
+        || (p.place_id && (childClicked === p.place_id || childClicked?.id === p.place_id))
+        || (p.name && (childClicked === p.name || childClicked?.name === p.name || String(childClicked).toLowerCase() === String(p.name).toLowerCase()))
+      ));
+
+      if (selectedIndex !== -1 && suggestionRefs[selectedIndex]?.current) {
+        suggestionRefs[selectedIndex].current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    } else {
+      if (!places || places.length === 0) return;
       const selectedIndex = places.findIndex((p, idx) => (
         childClicked === idx
         || String(childClicked) === String(idx)
@@ -194,7 +221,7 @@ const Dashboard = ({
         elRefs[selectedIndex].current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }
-  }, [childClicked, elRefs, places]);
+  }, [childClicked, elRefs, suggestionRefs, places, suggestedPlaces, activeTab]);
   const [localTime, setLocalTime] = useState(() => {
     try {
       return new Intl.DateTimeFormat('en-US', {
@@ -597,19 +624,18 @@ const Dashboard = ({
             {suggestedPlaces && suggestedPlaces.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {suggestedPlaces.map((place, i) => {
-                  const targetIndex = place.originalIndex !== undefined ? place.originalIndex : i;
                   const isSelected = Boolean(
                     childClicked && (
-                      childClicked === targetIndex
-                      || String(childClicked) === String(targetIndex)
-                      || (typeof childClicked === 'object' && childClicked.index === targetIndex)
+                      childClicked === i
+                      || String(childClicked) === String(i)
+                      || (typeof childClicked === 'object' && (childClicked.index === i || childClicked.index === place.originalIndex))
                       || (place.place_id && (childClicked === place.place_id || childClicked?.id === place.place_id))
                       || (place.name && (childClicked === place.name || childClicked?.name === place.name || String(childClicked).toLowerCase() === String(place.name).toLowerCase()))
                     ),
                   );
 
                   return (
-                    <div ref={elRefs[targetIndex]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
+                    <div ref={suggestionRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
                       {/* AI Analysis Tag with Rank */}
                       <Box
                         style={{
@@ -665,7 +691,7 @@ const Dashboard = ({
                       <PlaceDetails
                         place={place}
                         selected={isSelected}
-                        refProp={elRefs[targetIndex]}
+                        refProp={suggestionRefs[i]}
                         isAiPick
                         selectedDestination={selectedDestination}
                         setSelectedDestination={setSelectedDestination}
