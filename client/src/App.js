@@ -36,18 +36,6 @@ const App = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      ({ coords: { latitude, longitude } }) => {
-        setCoords({ lat: latitude, lng: longitude });
-      },
-      () => {
-        // Default coordinates (Kunnamangalam)
-        setCoords({ lat: 11.3064, lng: 75.8650 });
-      },
-    );
-  }, []);
-
-  useEffect(() => {
     if (coords.lat && coords.lng) {
       // 1. Weather API (Google Weather with Open-Meteo fallback)
       fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${process.env.REACT_APP_GOOGLE_MAP_API_KEY}&location.latitude=${coords.lat}&location.longitude=${coords.lng}`)

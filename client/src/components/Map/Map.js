@@ -21,16 +21,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
   const [routeInfo, setRouteInfo] = React.useState(null);
 
   const handleMyLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords: { latitude, longitude } }) => {
-          setCoords({ lat: latitude, lng: longitude });
-        },
-        // eslint-disable-next-line no-console
-        (error) => console.error(error),
-        { enableHighAccuracy: true },
-      );
-    }
+    setCoords({ lat: 11.3064, lng: 75.8650 });
   };
 
   const errorBannerStyle = {
@@ -144,7 +135,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked, setMap, we
       </Paper>
       <GoogleMapReact
         bootstrapURLKeys={{ key: process.env.REACT_APP_GOOGLE_MAP_API_KEY, libraries: ['places'] }}
-        defaultCenter={{ lat: 0, lng: 0 }}
+        defaultCenter={{ lat: 11.3064, lng: 75.8650 }}
         center={coords}
         defaultZoom={14}
         margin={[50, 50, 50, 50]}
