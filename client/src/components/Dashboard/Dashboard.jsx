@@ -507,94 +507,112 @@ const Dashboard = ({
 
       {/* 4. Places List & Suggestions Tabs for Selected Category */}
       <Box style={{ flexShrink: 0 }}>
-        {/* Category Places vs AI Suggestions Tab Switcher */}
+        {/* Category Places vs AI Suggestions Tab Switcher - Frozen/Sticky Header */}
         <Box
-          display="flex"
-          alignItems="center"
           style={{
-            gap: '8px',
+            position: 'sticky',
+            top: '-20px',
+            zIndex: 30,
+            backgroundColor: '#0f172a',
+            paddingTop: '20px',
+            paddingBottom: '12px',
+            marginLeft: '-20px',
+            marginRight: '-20px',
+            paddingLeft: '20px',
+            paddingRight: '20px',
+            borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: '0 8px 20px -4px rgba(0, 0, 0, 0.5)',
             marginBottom: '16px',
-            backgroundColor: 'rgba(15, 23, 42, 0.7)',
-            padding: '4px',
-            borderRadius: '10px',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
           }}
         >
-          {/* Tab 1: Category Name (Count) */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('all')}
+          <Box
+            display="flex"
+            alignItems="center"
             style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: activeTab === 'all' ? 700 : 500,
-              color: activeTab === 'all' ? '#ffffff' : '#94a3b8',
-              backgroundColor: activeTab === 'all' ? '#2563eb' : 'transparent',
-              boxShadow: activeTab === 'all' ? '0 2px 8px rgba(37, 99, 235, 0.4)' : 'none',
-              transition: 'all 0.2s ease',
+              gap: '8px',
+              backgroundColor: 'rgba(15, 23, 42, 0.85)',
+              padding: '4px',
+              borderRadius: '10px',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(12px)',
             }}
           >
-            <ExploreIcon style={{ fontSize: '16px', color: activeTab === 'all' ? '#ffffff' : '#60a5fa' }} />
-            <span>{categoryTitles[type] || 'Places'}</span>
-            <span
+            {/* Tab 1: Category Name (Count) */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('all')}
               style={{
-                backgroundColor: activeTab === 'all' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(148, 163, 184, 0.15)',
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: activeTab === 'all' ? 700 : 500,
                 color: activeTab === 'all' ? '#ffffff' : '#94a3b8',
-                padding: '1px 6px',
-                borderRadius: '10px',
-                fontSize: '0.75rem',
-                fontWeight: 600,
+                backgroundColor: activeTab === 'all' ? '#2563eb' : 'transparent',
+                boxShadow: activeTab === 'all' ? '0 2px 8px rgba(37, 99, 235, 0.4)' : 'none',
+                transition: 'all 0.2s ease',
               }}
             >
-              {places?.length || 0}
-            </span>
-          </button>
+              <ExploreIcon style={{ fontSize: '16px', color: activeTab === 'all' ? '#ffffff' : '#60a5fa' }} />
+              <span>{categoryTitles[type] || 'Places'}</span>
+              <span
+                style={{
+                  backgroundColor: activeTab === 'all' ? 'rgba(255, 255, 255, 0.2)' : 'rgba(148, 163, 184, 0.15)',
+                  color: activeTab === 'all' ? '#ffffff' : '#94a3b8',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                }}
+              >
+                {places?.length || 0}
+              </span>
+            </button>
 
-          {/* Tab 2: Suggestions */}
-          <button
-            type="button"
-            onClick={() => setActiveTab('suggestions')}
-            style={{
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '6px',
-              padding: '8px 12px',
-              borderRadius: '8px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.85rem',
-              fontWeight: activeTab === 'suggestions' ? 700 : 500,
-              color: activeTab === 'suggestions' ? '#ffffff' : '#94a3b8',
-              background: activeTab === 'suggestions' ? 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)' : 'transparent',
-              boxShadow: activeTab === 'suggestions' ? '0 2px 10px rgba(124, 58, 237, 0.4)' : 'none',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <StarsIcon style={{ fontSize: '16px', color: activeTab === 'suggestions' ? '#fbbf24' : '#a78bfa' }} />
-            <span>Suggestions</span>
-            <span
+            {/* Tab 2: Suggestions */}
+            <button
+              type="button"
+              onClick={() => setActiveTab('suggestions')}
               style={{
-                backgroundColor: activeTab === 'suggestions' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(124, 58, 237, 0.2)',
-                color: activeTab === 'suggestions' ? '#ffffff' : '#c4b5fd',
-                padding: '1px 6px',
-                borderRadius: '10px',
-                fontSize: '0.75rem',
-                fontWeight: 600,
+                flex: 1,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                fontWeight: activeTab === 'suggestions' ? 700 : 500,
+                color: activeTab === 'suggestions' ? '#ffffff' : '#94a3b8',
+                background: activeTab === 'suggestions' ? 'linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%)' : 'transparent',
+                boxShadow: activeTab === 'suggestions' ? '0 2px 10px rgba(124, 58, 237, 0.4)' : 'none',
+                transition: 'all 0.2s ease',
               }}
             >
-              {suggestedPlaces.length}
-            </span>
-          </button>
+              <StarsIcon style={{ fontSize: '16px', color: activeTab === 'suggestions' ? '#fbbf24' : '#a78bfa' }} />
+              <span>Suggestions</span>
+              <span
+                style={{
+                  backgroundColor: activeTab === 'suggestions' ? 'rgba(255, 255, 255, 0.25)' : 'rgba(124, 58, 237, 0.2)',
+                  color: activeTab === 'suggestions' ? '#ffffff' : '#c4b5fd',
+                  padding: '1px 6px',
+                  borderRadius: '10px',
+                  fontSize: '0.75rem',
+                  fontWeight: 600,
+                }}
+              >
+                {suggestedPlaces.length}
+              </span>
+            </button>
+          </Box>
         </Box>
 
         {activeTab === 'suggestions' ? (
@@ -635,7 +653,7 @@ const Dashboard = ({
                   );
 
                   return (
-                    <div ref={suggestionRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
+                    <div ref={suggestionRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '80px' }}>
                       {/* AI Analysis Tag with Rank */}
                       <Box
                         style={{
@@ -723,7 +741,7 @@ const Dashboard = ({
                   );
 
                   return (
-                    <div ref={elRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '16px' }}>
+                    <div ref={elRefs[i]} key={place.place_id || i} style={{ scrollMarginTop: '80px' }}>
                       <PlaceDetails
                         place={place}
                         selected={isSelected}
